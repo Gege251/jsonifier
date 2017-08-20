@@ -1,0 +1,21 @@
+{
+  "name": "jsonifier",
+  "version": "1.0.0",
+  "description": "Local drive versioning for personal use",
+  "main": "jsonifier.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gege251/jsonifier.git"
+  },
+  "author": "Szabo Gergely",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Gege251/jsonifier/issues"
+  },
+  "homepage": "https://github.com/Gege251/jsonifier#readme"
+}
