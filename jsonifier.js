@@ -1,29 +1,43 @@
-const jsonify			= require('./jsonify');
-const reportify		= require('./reportify');
-const directorify = require('./directorify');
-const init				= require('./init');
+const parseArgs		= require('minimist');
+const path				= require('path');
 
-var directory = process.argv[3] ? process.argv[3] : process.argv[1];
+const jsonify					= require('./jsonify');
+const reportify				= require('./reportify');
+const directorify 		= require('./directorify');
+const init						= require('./init');
+const newChange				= require('./newChange');
+const addFileToChange	= require('./addFileToChange');
 
-switch (process.argv[2]) {
+const argv = parseArgs(process.argv.slice(2));
+const directory = path.resolve(argv.d ? argv.d : process.argv[1]);
+
+// console.log(argv);
+
+switch (argv._[0]) {
 	case 'j':
 	case 'jsonify':
 		jsonify(directory);
 		break;
-	case '-r':
+	case 'r':
+	case 'reportify':
 		reportify(directory);
 		break;
-	case '-d':
+	case 'd':
+	case 'directoryify':
 		directorify(directory);
 		break;
 	// Initialize a new project
-	case 'init': 
+	case 'init':
 		init(directory);
 		break;
 	// Create a new change
 	case 'new':
+	case 'n':
+		newChange(directory, argv.n);
 		break;
 	// Add a new file to a change
 	case 'add':
+	case '+':
+		addFileToChange(directory, argv.n);
 		break;
 }

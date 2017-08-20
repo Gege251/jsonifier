@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = function(directory) {
 
 	const inputFile = path.join(directory, 'changes.json');
-	const configFile = path.join(directory, '.ifyconf');
+	const configFile = path.join(directory, '../.deployconf');
 
 	if (!fs.existsSync(inputFile)) {
 		console.log('changes.json file doesn\'t exist.')
@@ -12,7 +12,7 @@ module.exports = function(directory) {
 	}
 
 	if (!fs.existsSync(configFile)) {
-		console.log('.ifyconf file doesn\'t exist.')
+		console.log('Project folder is not initialized.')
 		return;
 	}
 
@@ -27,7 +27,7 @@ module.exports = function(directory) {
 		var files = JSON.parse(data);
 
 		files.forEach(file => {
-			console.log('Copying: ' + path.join(ifyconf.source, file.path, file.filename));		
+			console.log('Copying: ' + path.join(ifyconf.source, file.path, file.filename));
 			fs.mkdirsSync(path.join(directory, ifyconf.name, ifyconf.originalVersion, file.path));
 			fs.mkdirsSync(path.join(directory, ifyconf.name, ifyconf.editedVersion, file.path));
 			fs.copySync(path.join(ifyconf.source, file.path, file.filename), path.join(directory, ifyconf.name, ifyconf.originalVersion, file.path, file.filename));
