@@ -1,4 +1,3 @@
-const program			= require('command');
 const jsonify			= require('./jsonify');
 const reportify		= require('./reportify');
 const directorify = require('./directorify');
@@ -7,7 +6,8 @@ const init				= require('./init');
 var directory = process.argv[3] ? process.argv[3] : process.argv[1];
 
 switch (process.argv[2]) {
-	case '-j':
+	case 'j':
+	case 'jsonify':
 		jsonify(directory);
 		break;
 	case '-r':
@@ -16,7 +16,14 @@ switch (process.argv[2]) {
 	case '-d':
 		directorify(directory);
 		break;
-	case 'init':
+	// Initialize a new project
+	case 'init': 
 		init(directory);
+		break;
+	// Create a new change
+	case 'new':
+		break;
+	// Add a new file to a change
+	case 'add':
 		break;
 }
