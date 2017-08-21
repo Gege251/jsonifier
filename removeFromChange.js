@@ -1,8 +1,11 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-module.exports = function(directory, file) {
+module.exports = function(directory, fileDel) {
 
+	console.log('Are you sure you want to delete file? (using the "archive" option is advised instead)');
+
+	// TODO 
 	const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
 
@@ -17,28 +20,35 @@ module.exports = function(directory, file) {
 		return;
 	}
 	var changes = JSON.parse(fs.readFileSync(changesFile, 'utf8'));
+	var changeIndex = changes.findIndex(file => { return path.join(file.path, file.filename) == path.join(fileDel) });
 
-	if (!changes.some(file => { return path.join(file.path, file.filename) === path.join(fileSrc) })) {
+	if (changeIndex === -1) {
 		console.log('File is not registered in the change');
 		return;
+	} else {
+		changes.splice(changeIndex, 1);
 	}
 
-	// fs.mkdirsSync(path.join(directory, deployConf.originalVersion, path.dirname(fileSrc)));
-	// fs.mkdirsSync(path.join(directory, deployConf.editedVersion, path.dirname(fileSrc)));
-	// fs.copySync(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.originalVersion, fileSrc));
-	// fs.copySync(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc));
-	// console.log('Files copied.');
+	fs.removeSync(path.join(directory, deployConf.originalVersion, fileDel));
+	fs.removeSync(path.join(directory, deployConf.editedVersion, fileDel));
 
-	// changes.push({
-	// 	filename: path.basename(fileSrc),
-	// 	path: path.dirname(fileSrc)
-	// })
+	var pathRemains = path.join(directory, deployConf.originalVersion, path.dirname(fileDel));
+	while (pathRemains !== path.join(directory, deployConf.originalVersion) && fs.readdirSync(pathRemains).length == 0) {
+		fs.removeSync(pathRemains);
+		pathRemains = path.dirname(pathRemains);
+	}
 
-	// fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
-	// 	if (!err) {
-	// 		console.log('changes.json successfully saved.');
-	// 	} else {
-	// 		console.log('File write error.')
-	// 	}
-	// });
+	pathRemains = path.join(directory, deployConf.editedVersion, path.dirname(fileDel));
+	while (pathRemains !== path.join(directory, deployConf.editedVersion) && fs.readdirSync(pathRemains).length == 0) {
+		fs.removeSync(pathRemains);
+		pathRemains = path.dirname(pathRemains);
+	}
+
+	fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
+		if (!err) {
+			console.log('changes.json successfully saved.');
+		} else {
+			console.log('File write error.')
+		}
+	});
 }
