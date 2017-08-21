@@ -7,6 +7,7 @@ const directorify 		= require('./directorify');
 const init				= require('./init');
 const newChange			= require('./newChange');
 const addFileToChange	= require('./addFileToChange');
+const removeFromChange	= require('./removeFromChange');
 const archiveChange		= require('./archiveChange');
 
 const argv = parseArgs(process.argv.slice(2));
@@ -46,7 +47,7 @@ switch (argv._[0]) {
 	// Remove file from change
 	case 'remove':
 	case '-':
-		console.log('remove');
+		removeFromChange(directory, argv.n)
 		break;
 
 	// Resolve according to change.json
