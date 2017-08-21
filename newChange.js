@@ -16,7 +16,7 @@ module.exports = function(directory, changeName) {
   }
 
   fs.mkdirsSync(changePath);
-  fs.writeFile(path.join(changePath, 'changes.json'), '{}', err => {
+  fs.writeFile(path.join(changePath, 'changes.json'), '[]', err => {
     if (err) {
       console.log('File writing error.')
     } else {

@@ -6,7 +6,6 @@ module.exports = function(directory, fileSrc) {
 	const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
 
-	console.log(deployConfFile)
 	if (!fs.existsSync(deployConfFile)) {
 		console.log('Project folder is not initialized.')
 		return;
@@ -18,10 +17,14 @@ module.exports = function(directory, fileSrc) {
 		return;
 	}
 
-
 	var changes = [];
 	if (fs.existsSync(changesFile)) {
 		changes = JSON.parse(fs.readFileSync(changesFile, 'utf8'));
+	}
+
+	if (changes.some(file => { return path.join(file.path, file.filename) === path.join(fileSrc) })) {
+		console.log('File is already added to the change');
+		return;
 	}
 
 	fs.mkdirsSync(path.join(directory, deployConf.originalVersion, path.dirname(fileSrc)));

@@ -1,17 +1,19 @@
-const parseArgs		= require('minimist');
+const parseArgs			= require('minimist');
 const path				= require('path');
 
-const jsonify					= require('./jsonify');
-const reportify				= require('./reportify');
+const jsonify			= require('./jsonify');
+const reportify			= require('./reportify');
 const directorify 		= require('./directorify');
-const init						= require('./init');
-const newChange				= require('./newChange');
+const init				= require('./init');
+const newChange			= require('./newChange');
 const addFileToChange	= require('./addFileToChange');
+const archiveChange		= require('./archiveChange');
 
 const argv = parseArgs(process.argv.slice(2));
 const directory = path.resolve(argv.d ? argv.d : process.argv[1]);
 
 // console.log(argv);
+// console.log(directory);
 
 switch (argv._[0]) {
 	case 'j':
@@ -39,5 +41,19 @@ switch (argv._[0]) {
 	case 'add':
 	case '+':
 		addFileToChange(directory, argv.n);
+		break;
+
+	// Remove file from change
+	case 'remove':
+	case '-':
+		console.log('remove');
+		break;
+
+	// Resolve according to change.json
+
+	// Archive change
+	case 'archive':
+	case 'a':
+		archiveChange(directory);
 		break;
 }
