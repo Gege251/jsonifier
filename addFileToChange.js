@@ -28,37 +28,42 @@ module.exports = function(directory, fileSrc) {
 		return;
 	}
 
-	fs.mkdirsSync(path.join(directory, deployConf.originalVersion, path.dirname(fileSrc)));
-	fs.mkdirsSync(path.join(directory, deployConf.editedVersion, path.dirname(fileSrc)));
-	fs.copySync(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.originalVersion, fileSrc));
-	fs.copySync(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc));
-	console.log('Files copied.');
+	fs.mkdirs(path.join(directory, deployConf.originalVersion, path.dirname(fileSrc)))
+		.then(fs.mkdirs(path.join(directory, deployConf.editedVersion, path.dirname(fileSrc))))
+		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.originalVersion, fileSrc)))
+		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc)))
+		.then(() => {
+			console.log('File added.');
 
-	// Creating hash
-	var readStream = fs.createReadStream(path.join(deployConf.source, fileSrc));
-	var hash = crypto.createHash('sha1');
-	hash.setEncoding('hex');
+			// Creating hash
+			var readStream = fs.createReadStream(path.join(deployConf.source, fileSrc));
+			var hash = crypto.createHash('sha1');
+			hash.setEncoding('hex');
 
-	readStream.on('end', () => {
-		hash.end();
-		var fileHash = hash.read();
-		changes.push({
-			filename: path.basename(fileSrc),
-			path: path.dirname(fileSrc),
-			originalVersionHash: fileHash,
-			editedVersionHash: fileHash
+			readStream.on('end', () => {
+				hash.end();
+				var fileHash = hash.read();
+				changes.push({
+					filename: path.basename(fileSrc),
+					path: path.dirname(fileSrc),
+					originalVersionHash: fileHash,
+					editedVersionHash: fileHash
+				})
+
+				fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
+					if (!err) {
+						console.log('changes.json successfully saved.');
+					} else {
+						console.log('File write error.')
+					}
+				});
+			})
+
+			readStream.pipe(hash);
+
 		})
-
-		fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
-			if (!err) {
-				console.log('changes.json successfully saved.');
-			} else {
-				console.log('File write error.')
-			}
-		});
-	})
-
-	readStream.pipe(hash);
-
+		.catch((err) => {
+			console.log('IO Error.');
+		})
 
 }

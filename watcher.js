@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const crypto = require('crypto');
+const chokidar = require('chokidar');
 
 module.exports = function(directory) {
   const changesFile = path.join(directory, 'changes.json');
@@ -20,9 +21,10 @@ module.exports = function(directory) {
 
   changes
     .forEach(change => {
-      fs.watch(path.join(deployConf.source, change.path, change.filename), (e, file) => {
+      chokidar.watch(path.join(deployConf.source, change.path, change.filename))
+        .on('all', (e, watchedFile) => {
         // make a hash of the file
-        var readStream = fs.createReadStream(path.join(deployConf.source, change.path, change.filename));
+        var readStream = fs.createReadStream(watchedFile);
         var hash = crypto.createHash('sha1');
         hash.setEncoding('hex');
 
@@ -33,27 +35,24 @@ module.exports = function(directory) {
           // compare hash with the one in changes.json
           // if different save file to output, and the new hash to changes.json
           if (change.editedVersionHash !== fileHash) {
-            fs.copy(
-                  path.join(deployConf.source, change.path, change.filename),
-                  path.join(directory, deployConf.editedVersion, change.path, change.filename))
-              .then(err => {
+            fs.copy(watchedFile, path.join(directory, deployConf.editedVersion, change.path, change.filename))
+              .then(() => {
                 console.log(change.filename + ' saved.');
                 change.editedVersionHash = fileHash;
-                fs.writeFile(changesFile, JSON.stringify(changes, null, 4))
-                  .then(err => {
-                  if (!err) {
-                    console.log('changes.json successfully saved.');
-                  } else {
-                    console.log('File write error.');
-                  }
-                })
-           })
-            
+                return fs.writeFile(changesFile, JSON.stringify(changes, null, 4))
+              })
+              .then(() => {
+                console.log('changes.json saved.');
+              })
+              .catch(err => {
+                console.log('IO error.');
+              })
+
           }
         })
         readStream.pipe(hash);
-        
-      });
+
+      })
     })
 
     console.log('Watching for changes in ' + deployConf.source);

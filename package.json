@@ -4,6 +4,7 @@
   "description": "Local drive versioning for personal use",
   "main": "jsonifier.js",
   "dependencies": {
+    "chokidar": "^1.7.0",
     "fs-extra": "^4.0.1",
     "inquirer": "^3.2.2",
     "minimist": "^1.2.0"
