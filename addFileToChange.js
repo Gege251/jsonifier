@@ -46,7 +46,7 @@ module.exports = function(directory, fileSrc) {
 			filename: path.basename(fileSrc),
 			path: path.dirname(fileSrc),
 			originalVersionHash: fileHash,
-			editedVerisonHash: fileHash
+			editedVersionHash: fileHash
 		})
 
 		fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {

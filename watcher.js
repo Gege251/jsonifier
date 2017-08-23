@@ -32,7 +32,7 @@ module.exports = function(directory) {
 
           // compare hash with the one in changes.json
           // if different save file to output, and the new hash to changes.json
-          if (change.editedVerionHash !== fileHash) {
+          if (change.editedVersionHash !== fileHash) {
             fs.copy(
                   path.join(deployConf.source, change.path, change.filename),
                   path.join(directory, deployConf.editedVersion, change.path, change.filename))
