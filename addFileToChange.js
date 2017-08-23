@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
+const crypto = require('crypto');
 
 module.exports = function(directory, fileSrc) {
 
@@ -33,16 +34,31 @@ module.exports = function(directory, fileSrc) {
 	fs.copySync(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc));
 	console.log('Files copied.');
 
-	changes.push({
-		filename: path.basename(fileSrc),
-		path: path.dirname(fileSrc)
+	// Creating hash
+	var readStream = fs.createReadStream(path.join(deployConf.source, fileSrc));
+	var hash = crypto.createHash('sha1');
+	hash.setEncoding('hex');
+
+	readStream.on('end', () => {
+		hash.end();
+		var fileHash = hash.read();
+		changes.push({
+			filename: path.basename(fileSrc),
+			path: path.dirname(fileSrc),
+			originalVersionHash: fileHash,
+			editedVerisonHash: fileHash
+		})
+
+		fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
+			if (!err) {
+				console.log('changes.json successfully saved.');
+			} else {
+				console.log('File write error.')
+			}
+		});
 	})
 
-	fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
-		if (!err) {
-			console.log('changes.json successfully saved.');
-		} else {
-			console.log('File write error.')
-		}
-	});
+	readStream.pipe(hash);
+
+
 }

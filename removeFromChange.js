@@ -2,10 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 
 module.exports = function(directory, fileDel) {
-
-	console.log('Are you sure you want to delete file? (using the "archive" option is advised instead)');
-
-	// TODO 
 	const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
 
@@ -25,8 +21,13 @@ module.exports = function(directory, fileDel) {
 	if (changeIndex === -1) {
 		console.log('File is not registered in the change');
 		return;
-	} else {
-		changes.splice(changeIndex, 1);
+	}
+
+	// If the file has been edited since the add then ask for confirmation
+	if (changes[changeIndex].originalVersionHash !== changes[changeIndex].editedVersionHash) {
+		console.log('This file has been edited. Are you sure you want to delete it? (using the "archive" option is advised instead)');
+		// TODO 
+		return;
 	}
 
 	fs.removeSync(path.join(directory, deployConf.originalVersion, fileDel));
@@ -43,6 +44,8 @@ module.exports = function(directory, fileDel) {
 		fs.removeSync(pathRemains);
 		pathRemains = path.dirname(pathRemains);
 	}
+
+	changes.splice(changeIndex, 1);
 
 	fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
 		if (!err) {
