@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = function(directory) {
 	const inputFile = path.resolve(directory, 'changes.json');
-	const outputFile = path.resolve(directory, 'changes.txt');
+	const outputFile = path.resolve(directory, 'report.txt');
 
 	fs.readFile(inputFile, 'utf8', (err, data) => {
 		if (err) {

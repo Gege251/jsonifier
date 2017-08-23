@@ -18,6 +18,11 @@ module.exports = function(directory, fileSrc) {
 		return;
 	}
 
+	if (fs.lstatSync(path.join(deployConf.source, fileSrc)).isFile() ) {
+		console.log('The given source is not a file.');
+		return;
+	}
+
 	var changes = [];
 	if (fs.existsSync(changesFile)) {
 		changes = JSON.parse(fs.readFileSync(changesFile, 'utf8'));

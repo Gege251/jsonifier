@@ -21,8 +21,7 @@ module.exports = function(directory) {
 
   changes
     .forEach(change => {
-      chokidar.watch(path.join(deployConf.source, change.path, change.filename))
-        .on('all', (e, watchedFile) => {
+      chokidar.watch(path.join(deployConf.source, change.path, change.filename)).on('change', watchedFile => {
         // make a hash of the file
         var readStream = fs.createReadStream(watchedFile);
         var hash = crypto.createHash('sha1');

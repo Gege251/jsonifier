@@ -26,7 +26,7 @@ module.exports = function(directory, fileDel) {
 	// If the file has been edited since the add then ask for confirmation
 	if (changes[changeIndex].originalVersionHash !== changes[changeIndex].editedVersionHash) {
 		console.log('This file has been edited. Are you sure you want to delete it? (using the "archive" option is advised instead)');
-		// TODO 
+		// TODO
 		return;
 	}
 
