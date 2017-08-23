@@ -3,9 +3,13 @@ const path = require('path');
 const crypto = require('crypto');
 
 module.exports = function(directory, fileSrc) {
-
 	const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
+
+	if (!fileSrc) {
+		console.log('File name must be passed by -n');
+		return;
+	}
 
 	if (!fs.existsSync(deployConfFile)) {
 		console.log('Project folder is not initialized.')
@@ -18,7 +22,7 @@ module.exports = function(directory, fileSrc) {
 		return;
 	}
 
-	if (fs.lstatSync(path.join(deployConf.source, fileSrc)).isFile() ) {
+	if (!fs.lstatSync(path.join(deployConf.source, fileSrc)).isFile() ) {
 		console.log('The given source is not a file.');
 		return;
 	}

@@ -10,26 +10,30 @@ const addFileToChange		= require('./addFileToChange');
 const removeFromChange	= require('./removeFromChange');
 const archiveChange			= require('./archiveChange');
 const watcher						= require('./watcher');
+const list							= require('./list');
 
 const argv = parseArgs(process.argv.slice(2));
-const directory = path.resolve(argv.d ? argv.d : process.argv[1]);
+const directory = path.resolve(argv.d ? argv.d : process.cwd());
 
 // console.log(argv);
-// console.log(directory);
 
 switch (argv._[0]) {
-	case 'j':
-	case 'jsonify':
-		jsonify(directory);
+	case 'list':
+	case 'l':
+		list(directory, argv.v);
 		break;
-	case 'r':
+	// case 'j':
+	// case 'jsonify':
+	// 	jsonify(directory);
+	// 	break;
 	case 'reportify':
+	case 'r':
 		reportify(directory);
 		break;
-	case 'd':
-	case 'directoryify':
-		directorify(directory);
-		break;
+	// case 'd':
+	// case 'directoryify':
+	// 	directorify(directory);
+	// 	break;
 	// Initialize a new project
 	case 'init':
 		init(directory);

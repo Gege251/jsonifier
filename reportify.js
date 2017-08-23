@@ -2,28 +2,30 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = function(directory) {
-	const inputFile = path.resolve(directory, 'changes.json');
-	const outputFile = path.resolve(directory, 'report.txt');
+	const changeFile = path.join(directory, 'changes.json');
+	const outputFile = path.join(directory, 'report.txt');
 
-	fs.readFile(inputFile, 'utf8', (err, data) => {
+	fs.readFile(changeFile, 'utf8', (err, data) => {
 		if (err) {
 			console.log('File reading failed.');
 			return;
 		}
 
 		var files = JSON.parse(data);
-		var output = ""
+		var output = "";
 
 		files.forEach(file => {
-			output += file.file + '\r\n';
+			output += file.filename + '\r\n';
 			output += '\t' + file.path + '\r\n';
 
-			file.changes.forEach(change => {
-				output += '\t' + change.lines + '\r\n';
-				output += '\t\t' + change.explanation + '\r\n';
+			if (file.changes) {
+				file.changes.forEach(change => {
+					output += '\t' + change.lines + '\r\n';
+					output += '\t\t' + change.explanation + '\r\n';
 
-				output += '\r\n';
-			})
+					output += '\r\n';
+				})
+			}
 		})
 
 		fs.writeFile(outputFile, output, err => {

@@ -5,6 +5,11 @@ module.exports = function(directory, fileDel) {
 	const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
 
+	if (!fileDel) {
+		console.log('File name must be passed by -n');
+		return;
+	}
+
 	if (!fs.existsSync(deployConfFile)) {
 		console.log('Project folder is not initialized.')
 		return;
