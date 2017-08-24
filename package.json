@@ -1,6 +1,7 @@
 {
   "name": "jsonifier",
   "version": "1.0.0",
+  "bin": "./bin/jsonifier",
   "description": "Local drive versioning for personal use",
   "main": "jsonifier.js",
   "dependencies": {
