@@ -2,17 +2,12 @@ const fs = require('fs-extra');
 const path = require('path');
 const crypto = require('crypto');
 const chokidar = require('chokidar');
-
-function logger(message) {
-  var log = '[' + new Date().toLocaleString() +'] ' + message;
-  console.log(log);
-  // fs.append(logFile, log)
-  //   .catch(console.log('Log file writing error'));
-}
+const Logger = require('./logger');
 
 module.exports = function(directory) {
   const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
+  const logger = new Logger(path.join(directory, 'changes.log'));
 
 	if (!fs.existsSync(deployConfFile)) {
 		console.log('Project folder is not initialized.')
@@ -43,16 +38,16 @@ module.exports = function(directory) {
           if (change.editedVersionHash !== fileHash) {
             fs.copy(watchedFile, path.join(directory, deployConf.editedVersion, change.path, change.filename))
               .then(() => {
-                logger(change.filename + ' saved.');
+                logger.log(change.filename + ' saved.');
                 change.editedVersionHash = fileHash;
                 change.changed = new Date().toLocaleString();
                 return fs.writeFile(changesFile, JSON.stringify(changes, null, 4))
               })
               .then(() => {
-                logger('changes.json saved.');
+                logger.log('changes.json saved.');
               })
               .catch(err => {
-                logger('IO error.');
+                logger.log('IO error.');
               })
 
           }
