@@ -3,6 +3,13 @@ const path = require('path');
 const crypto = require('crypto');
 const chokidar = require('chokidar');
 
+function logger(message) {
+  var log = '[' + new Date().toLocaleString() +'] ' + message;
+  console.log(log);
+  // fs.append(logFile, log)
+  //   .catch(console.log('Log file writing error'));
+}
+
 module.exports = function(directory) {
   const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
@@ -36,15 +43,16 @@ module.exports = function(directory) {
           if (change.editedVersionHash !== fileHash) {
             fs.copy(watchedFile, path.join(directory, deployConf.editedVersion, change.path, change.filename))
               .then(() => {
-                console.log(change.filename + ' saved.');
+                logger(change.filename + ' saved.');
                 change.editedVersionHash = fileHash;
+                change.changed = new Date().toLocaleString();
                 return fs.writeFile(changesFile, JSON.stringify(changes, null, 4))
               })
               .then(() => {
-                console.log('changes.json saved.');
+                logger('changes.json saved.');
               })
               .catch(err => {
-                console.log('IO error.');
+                logger('IO error.');
               })
 
           }

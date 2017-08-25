@@ -55,6 +55,8 @@ module.exports = function(directory, fileSrc) {
 				changes.push({
 					filename: path.basename(fileSrc),
 					path: path.dirname(fileSrc),
+					added: new Date().toLocaleString(),
+					changed: new Date().toLocaleString(),
 					originalVersionHash: fileHash,
 					editedVersionHash: fileHash
 				})
