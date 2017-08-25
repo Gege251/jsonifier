@@ -7,13 +7,14 @@ const Logger = require('./logger');
 module.exports = function(directory) {
   const changesFile = path.join(directory, 'changes.json');
 	const deployConfFile = path.join(directory, '../.deployconf');
-  const logger = new Logger(path.join(directory, 'changes.log'));
 
 	if (!fs.existsSync(deployConfFile)) {
 		console.log('Project folder is not initialized.')
 		return;
 	}
 	var deployConf = JSON.parse(fs.readFileSync(deployConfFile, 'utf8'));
+
+  const logger = new Logger(deployConf.logging ? path.join(directory, 'changes.log') : null);
 
 	if (!fs.existsSync(changesFile)) {
 		console.log('Changes.json doesn\t exist');
