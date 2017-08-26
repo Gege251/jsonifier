@@ -19,7 +19,7 @@ const directory = path.resolve(argv.d ? argv.d : process.cwd());
 
 switch (argv._[0]) {
 	case 'list':
-	case 'l':
+	case 'ls':
 		list(directory, argv.v);
 		break;
 	// case 'j':
