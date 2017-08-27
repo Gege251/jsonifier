@@ -41,7 +41,7 @@ module.exports = function(directory, fileSrc) {
 		.then(fs.mkdirs(path.join(directory, deployConf.editedVersion, path.dirname(fileSrc))))
 		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.originalVersion, fileSrc)))
 		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc)))
-		.then(() => {
+		.then(_ => {
 			console.log('File added.');
 
 			// Creating hash
@@ -49,7 +49,7 @@ module.exports = function(directory, fileSrc) {
 			var hash = crypto.createHash('sha1');
 			hash.setEncoding('hex');
 
-			readStream.on('end', () => {
+			readStream.on('end', _ => {
 				hash.end();
 				var fileHash = hash.read();
 				changes.push({

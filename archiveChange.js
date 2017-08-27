@@ -16,30 +16,32 @@ module.exports = function(directory) {
 		result;
 	}
 
-	console.log('Arhiving...')
+	console.log('Archiving...')
 
 	var date = new Date();
 	var fileStr = path.basename(directory) + '_' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 	var archivePath = path.join(directory, '../', deployConf.archive, path.basename(directory), fileStr);
 
-	fs.mkdirs(path.join(directory, '../', deployConf.archive, path.basename(directory)));
-	var counter = 0;
-	while (fs.existsSync(archivePath + '.zip')) {
-		counter++;
-		archivePath = path.join(directory, '../', deployConf.archive, path.basename(directory), fileStr + '_' + counter);
-	}
-	archivePath += '.zip';
+	fs.mkdirs(path.join(directory, '../', deployConf.archive, path.basename(directory)))
+		.then(_ => {
+			var counter = 0;
+			while (fs.existsSync(archivePath + '.zip')) {
+				counter++;
+				archivePath = path.join(directory, '../', deployConf.archive, path.basename(directory), fileStr + '_' + counter);
+			}
+			archivePath += '.zip';
 
-	var archiveFile =　fs.createWriteStream(archivePath);
-	var archive = archiver('zip', {
-		zlib: { level: 9 }
-	});
+			var archiveFile =　fs.createWriteStream(archivePath);
+			var archive = archiver('zip', {
+				zlib: { level: 9 }
+			});
 
-	archiveFile.on('close', _ => {
-		console.log('Archive created: ' +　archivePath);
-	});
-	archive.pipe(archiveFile);
-	archive.directory(directory, false);
-	archive.finalize();
+			archiveFile.on('close', _ => {
+				console.log('Archive created: ' +　archivePath);
+			});
+			archive.pipe(archiveFile);
+			archive.directory(directory, false);
+			archive.finalize();
+		})
 
 }

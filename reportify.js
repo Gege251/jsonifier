@@ -12,25 +12,23 @@ module.exports = function(directory) {
 		}
 
 		var files = JSON.parse(data);
-		var output = "";
+		var output = [];
 
 		files.forEach(file => {
-			output += file.filename + '\r\n';
-			output += '\t' + file.path + '\r\n';
+			output.push(file.filename);
+			output.push('\t' + file.path);
 
 			if (file.changes) {
 				file.changes.forEach(change => {
-					output += '\t' + change.lines + '\r\n';
-					output += '\t\t' + change.explanation + '\r\n';
-
-					output += '\r\n';
+					output.push('\t' + change.lines);
+					output.push('\t\t' + change.explanation);
 				})
 			}
 		})
 
-		fs.writeFile(outputFile, output, err => {
+		fs.writeFile(outputFile, output.join('\r\n'), err => {
 			if (!err) {
-				console.log('File successfully saved.');
+				console.log('report.txt is successfully written.');
 			} else {
 				console.log('File write error.')
 			}

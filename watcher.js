@@ -15,12 +15,18 @@ module.exports = function(directory) {
 	var deployConf = JSON.parse(fs.readFileSync(deployConfFile, 'utf8'));
 
   const logger = new Logger(deployConf.logging ? path.join(directory, 'changes.log') : null);
+  const log =　logger.log;
 
 	if (!fs.existsSync(changesFile)) {
-		console.log('Changes.json doesn\t exist');
+		console.log(`Changes.json doesn't exist`);
 		return;
 	}
 	var changes = JSON.parse(fs.readFileSync(changesFile, 'utf8'));
+
+  if (changes.length < 1) {
+    console.log('No files to watch.')
+    return;
+  }
 
   changes
     .forEach(change => {
@@ -39,16 +45,16 @@ module.exports = function(directory) {
           if (change.editedVersionHash !== fileHash) {
             fs.copy(watchedFile, path.join(directory, deployConf.editedVersion, change.path, change.filename))
               .then(() => {
-                logger.log(change.filename + ' saved.');
+                log(change.filename + ' saved.');
                 change.editedVersionHash = fileHash;
                 change.changed = new Date().toLocaleString();
                 return fs.writeFile(changesFile, JSON.stringify(changes, null, 4))
               })
               .then(() => {
-                logger.log('changes.json saved.');
+                log('changes.json saved.');
               })
               .catch(err => {
-                logger.log('IO error.');
+                log('IO error.');
               })
 
           }
@@ -59,5 +65,4 @@ module.exports = function(directory) {
     })
 
     console.log('Watching for changes in ' + deployConf.source);
-
 }

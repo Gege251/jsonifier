@@ -20,24 +20,30 @@ const directory = path.resolve(argv.d ? argv.d : process.cwd());
 switch (argv._[0]) {
 	case 'list':
 	case 'ls':
-		list(directory, argv.v);
+		list(directory, argv.l);
 		break;
+
 	// case 'j':
 	// case 'jsonify':
 	// 	jsonify(directory);
 	// 	break;
+
 	case 'reportify':
 	case 'r':
 		reportify(directory);
 		break;
+
+	// Import from changes.json
 	// case 'd':
 	// case 'directoryify':
 	// 	directorify(directory);
 	// 	break;
 	// Initialize a new project
+
 	case 'init':
 		init(directory);
 		break;
+
 	// Create a new change
 	case 'new':
 	case 'n':
@@ -46,24 +52,28 @@ switch (argv._[0]) {
 	// Add a new file to a change
 	case 'add':
 	case '+':
-		addFileToChange(directory, argv.n);
+		addFileToChange(directory, argv._[1]);
 		break;
 
 	// Remove file from change
 	case 'remove':
 	case '-':
-		removeFromChange(directory, argv.n)
+		removeFromChange(directory, argv._[1]);
 		break;
-
-	// Resolve according to change.json
 
 	// Archive change
 	case 'archive':
-	case 'a':
+	case 'ar':
+	case 'zip':
 		archiveChange(directory);
 		break;
+
 	case 'watch':
 	case 'w':
 		watcher(directory);
+		break;
+
+	default:
+	 	console.log('Jsonifier');
 		break;
 }
