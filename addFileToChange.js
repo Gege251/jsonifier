@@ -49,28 +49,21 @@ module.exports = function(directory, fileSrc) {
 			var hash = crypto.createHash('sha1');
 			hash.setEncoding('hex');
 
-			readStream.on('end', _ => {
-				hash.end();
-				var fileHash = hash.read();
-				changes.push({
-					filename: path.basename(fileSrc),
-					path: path.dirname(fileSrc),
-					added: new Date().toLocaleString(),
-					changed: new Date().toLocaleString(),
-					originalVersionHash: fileHash,
-					editedVersionHash: fileHash
-				})
-
-				fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
-					if (!err) {
-						console.log('changes.json successfully saved.');
-					} else {
-						console.log('File write error.')
-					}
-				});
+			var currentTime = new Date().toLocaleString();
+			changes.push({
+				filename: path.basename(fileSrc),
+				path: path.dirname(fileSrc),
+				added: currentTime,
+				changed: currentTime,
 			})
 
-			readStream.pipe(hash);
+			fs.writeFile(changesFile, JSON.stringify(changes, null, 4), err => {
+				if (!err) {
+					console.log('changes.json successfully saved.');
+				} else {
+					console.log('File write error.')
+				}
+			});
 
 		})
 		.catch((err) => {

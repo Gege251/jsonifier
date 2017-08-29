@@ -29,7 +29,7 @@ module.exports = function(directory, fileDel) {
 	}
 
 	// If the file has been edited since the add then ask for confirmation
-	if (changes[changeIndex].originalVersionHash !== changes[changeIndex].editedVersionHash) {
+	if (changes[changeIndex].added !== changes[changeIndex].changed) {
 		const rl = readline.createInterface({
 			input: process.stdin,
 			output: process.stdout
