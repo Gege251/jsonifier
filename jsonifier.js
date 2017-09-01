@@ -11,6 +11,7 @@ const removeFromChange	= require('./removeFromChange');
 const archiveChange			= require('./archiveChange');
 const watcher						= require('./watcher');
 const list							= require('./list');
+const createDirs	= require('./createDirs');
 
 const argv = parseArgs(process.argv.slice(2));
 const directory = path.resolve(argv.d ? argv.d : process.cwd());
@@ -47,8 +48,18 @@ switch (argv._[0]) {
 	// Create a new change
 	case 'new':
 	case 'n':
-		newChange(directory, argv.n);
+		newChange(directory, argv._[1]);
+		if (!argv.e) {
+			createDirs(path.join(directory, argv._[1]));
+		}
 		break;
+
+	// Create change directories
+	case 'createdirs':
+	case 'crd':
+		createDirs(directory);
+		break;
+
 	// Add a new file to a change
 	case 'add':
 	case '+':

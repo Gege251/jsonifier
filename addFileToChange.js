@@ -1,6 +1,5 @@
 const fs = require('fs-extra');
 const path = require('path');
-const crypto = require('crypto');
 
 module.exports = function(directory, fileSrc) {
 	const changesFile = path.join(directory, 'changes.json');
@@ -46,8 +45,6 @@ module.exports = function(directory, fileSrc) {
 
 			// Creating hash
 			var readStream = fs.createReadStream(path.join(deployConf.source, fileSrc));
-			var hash = crypto.createHash('sha1');
-			hash.setEncoding('hex');
 
 			var currentTime = new Date().toLocaleString();
 			changes.push({
