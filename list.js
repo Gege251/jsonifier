@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 
-module.exports = function(directory, verbose) {
+module.exports = function(directory, verbose, fullPath) {
 	const changeFile = path.join(directory, 'changes.json');
 	const outputFile = path.join(directory, 'report.txt');
 
@@ -16,9 +16,12 @@ module.exports = function(directory, verbose) {
 		var output = [];
 
 		files.forEach(file => {
+			var filePath = fullPath ? path.join(file.path, file.filename) : file.filename;
 			if (verbose) {
-				output.push(chalk.green(file.filename));
-				output.push('\t' + file.path);
+				output.push(chalk.green(filePath));
+				if (!fullPath) {
+					output.push('\t' + file.path);
+				}
 				output.push('\t' + file.added);
 				output.push('\t' + file.changed);
 
@@ -29,7 +32,7 @@ module.exports = function(directory, verbose) {
 				// 	})
 				// }
 			} else {
-				output.push(chalk.green(path.join(file.path, file.filename)));
+				output.push(chalk.green(filePath));
 			}
 		})
 
