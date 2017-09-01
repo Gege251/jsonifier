@@ -1,9 +1,6 @@
 const parseArgs					= require('minimist');
 const path							= require('path');
 
-const jsonify						= require('./lib/jsonify');
-const reportify					= require('./lib/reportify');
-const directorify 			= require('./lib/directorify');
 const init							= require('./lib/init');
 const newChange					= require('./lib/newChange');
 const addFileToChange		= require('./lib/addFileToChange');
@@ -21,7 +18,7 @@ const directory = path.resolve(argv.d ? argv.d : process.cwd());
 switch (argv._[0]) {
 	case 'list':
 	case 'ls':
-		list(directory, argv.l, argv.f);
+		list(directory, argv.l, argv.f, argv.r);
 		break;
 
 	// case 'j':
@@ -43,6 +40,12 @@ switch (argv._[0]) {
 
 	case 'init':
 		init(directory);
+		break;
+
+  // Create statistics based on project folder
+	case 'stats':
+	case 's':
+		stats(directory);
 		break;
 
 	// Create a new change
