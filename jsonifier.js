@@ -1,17 +1,17 @@
 const parseArgs					= require('minimist');
 const path							= require('path');
 
-const jsonify						= require('./jsonify');
-const reportify					= require('./reportify');
-const directorify 			= require('./directorify');
-const init							= require('./init');
-const newChange					= require('./newChange');
-const addFileToChange		= require('./addFileToChange');
-const removeFromChange	= require('./removeFromChange');
-const archiveChange			= require('./archiveChange');
-const watcher						= require('./watcher');
-const list							= require('./list');
-const createDirs	= require('./createDirs');
+const jsonify						= require('./lib/jsonify');
+const reportify					= require('./lib/reportify');
+const directorify 			= require('./lib/directorify');
+const init							= require('./lib/init');
+const newChange					= require('./lib/newChange');
+const addFileToChange		= require('./lib/addFileToChange');
+const removeFromChange	= require('./lib/removeFromChange');
+const archiveChange			= require('./lib/archiveChange');
+const watcher						= require('./lib/watcher');
+const list							= require('./lib/list');
+const createDirs				= require('./lib/createDirs');
 
 const argv = parseArgs(process.argv.slice(2));
 const directory = path.resolve(argv.d ? argv.d : process.cwd());
