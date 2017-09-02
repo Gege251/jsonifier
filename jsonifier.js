@@ -9,9 +9,10 @@ const archiveChange			= require('./lib/archiveChange');
 const watcher						= require('./lib/watcher');
 const list							= require('./lib/list');
 const createDirs				= require('./lib/createDirs');
+const stats							= require('./lib/stats');
 
 const argv = parseArgs(process.argv.slice(2));
-const directory = path.resolve(argv.d ? argv.d : process.cwd());
+const directory = path.resolve(argv.d || process.cwd());
 
 // console.log(argv);
 
@@ -45,22 +46,25 @@ switch (argv._[0]) {
   // Create statistics based on project folder
 	case 'stats':
 	case 's':
-		stats(directory);
+		stats(directory, argv.r);
 		break;
 
 	// Create a new change
 	case 'new':
 	case 'n':
-		newChange(directory, argv._[1]);
-		if (!argv.e) {
-			createDirs(path.join(directory, argv._[1]));
-		}
+		newChange(directory, argv._[1])
+			.then(_ => {
+				if (!argv.e) {
+					createDirs(path.join(directory, argv._[1]));
+				}
+			})
+			.catch(err => {});
 		break;
 
 	// Create change directories
 	case 'createdirs':
 	case 'crd':
-		createDirs(directory);
+		createDirs(directory).then();
 		break;
 
 	// Add a new file to a change
@@ -85,6 +89,10 @@ switch (argv._[0]) {
 	case 'watch':
 	case 'w':
 		watcher(directory);
+		break;
+
+	case 'versionup':
+		(require('./lib/versionup'))(directory);
 		break;
 
 	default:
