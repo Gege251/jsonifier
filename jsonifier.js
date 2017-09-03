@@ -58,6 +58,12 @@ const modules		= [
 		path: './lib/stats',
 		args: [ directory, argv.r ],
 		description: 'Write out statistics about current project.'
+	},
+	{
+		keys: [ 'versionup' ],
+		path: './lib/versionup',
+		args: [ directory ],
+		description: 'Updates changes.json format to actual version (temporary)'
 	}
 ]
 
