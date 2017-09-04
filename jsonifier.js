@@ -1,4 +1,5 @@
 const parseArgs	= require('minimist');
+const fs			= require('fs-extra');
 const path			= require('path');
 
 const argv			= parseArgs(process.argv.slice(2));
@@ -45,7 +46,7 @@ const modules		= [
 		keys: [ 'ls' ],
 		path: './lib/list',
 		args: [ directory, argv.l, argv.f, argv.r ],
-		description: 'List files in the change. Options: -l -f -r'
+		description: 'List files in the change. Options: -l detailed, -f full path, -r report to file'
 	},
 	{
 		keys: [ 'createdirs', 'crd' ],
@@ -60,18 +61,30 @@ const modules		= [
 		description: 'Write out statistics about current project.'
 	},
 	{
-		keys: [ 'versionup' ],
-		path: './lib/versionup',
+		keys: [ 'tasks', 't' ],
+		path: './lib/tasks/tasks',
 		args: [ directory ],
-		description: 'Updates changes.json format to actual version (temporary)'
-	}
+		description: 'Lists all tasks. Options: -a all'
+	},
+	{
+		keys: [ 'add-task', 't+' ],
+		path: './lib/tasks/addTask',
+		args: [ directory, argv._[1] ],
+		description: 'Adds a new task to change.'
+	},
+	{
+		keys: [ 'remove-task', 't-' ],
+		path: './lib/tasks/removeTask',
+		args: [ directory, argv._[1] ],
+		description: 'Removes a task from change.'
+	},
 ]
 
 function loadModule(moduleName) {
 	const module = modules.find(module => module.keys.includes(moduleName));
 	if (module) {
 		(require(module.path))(...module.args);
-	} else {
+	} else if (moduleName == 'help') {
 		// Listing all command options
 		console.log('Jsonifier commands:\n');
 
@@ -84,6 +97,10 @@ function loadModule(moduleName) {
 			let spaces = ' '.repeat(longestOption - module.keys.length + 2);
 			console.log('\t' + module.keys + spaces + module.description);
 		})
+	} else {
+		const version = fs.readJsonSync(path.join(__dirname, 'package.json')).version;
+		console.log('Jsonifier v' + version);
+		console.log(`For the list of commands write 'jsonifier help'`);
 	}
 }
 
