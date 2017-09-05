@@ -4,79 +4,109 @@ const path			= require('path');
 
 const argv			= parseArgs(process.argv.slice(2));
 const directory	= path.resolve(argv.d || process.cwd());
+const lang			= process.env.LANGUAGE == 'ja_JP' ? 'ja' : 'en';
+
+const config		= require('./lib/config-reader');
+
+config.load('../lang/en/messages', 'messages');
+config.read('messages');
 
 const modules		= [
 	{
 		keys: [ 'init' ],
 		path: './lib/init',
 		args: [ directory ],
-		description: 'Initialize project folder.'
+		description: {
+			en: 'Initialize project folder.',
+			ja: '新規プロジェクトフォルダーを作成。' }
 	},
 	{
 		keys: [ 'new', 'n' ],
-		path: './lib/newChange',
+		path: './lib/new-change',
 		args: [ directory, argv._[1] ],
-		description: 'Create a new change folder.'
+		description: {
+			en: 'Create a new change folder.',
+			ja: '新規課題フォルダーを作成。' }
 	},
 	{
 		keys: [ 'add', '+'],
-		path: './lib/addFileToChange',
+		path: './lib/add-to-change',
 		args: [ directory, argv._[1] ],
-		description: 'Add a new file to change.'
+		description: {
+			en: 'Add a new file to change.',
+			ja: 'ファイルを課題に追加。' }
 	},
 	{
 		keys: [ 'remove', '-'],
-		path: './lib/removeFromChange',
+		path: './lib/remove-from-change',
 		args: [ directory, argv._[1] ],
-		description: 'Remove a file from change'
+		description: {
+			en: 'Remove a file from change',
+			ja: 'ファイルを課題から排除。' }
 	},
 	{
-		keys: [ 'archive', 'zip'],
-		path: './lib/archiveChange',
+		keys: [ 'archive', 'ar'],
+		path: './lib/archive-change',
 		args: [ directory ],
-		description: 'Archive a change to zip file.'
+		description: {
+			en: 'Archive a change to zip file.',
+			ja: '課題の圧縮したアーカイブを作成。' }
 	},
 	{
 		keys: [ 'watcher', 'w' ],
 		path: './lib/watcher',
 		args: [ directory ],
-		description: 'Start watching files for changes.'
+		description: {
+			en: 'Watch source code for changes.',
+			ja: 'ソースコードを監視。' }
 	},
 	{
 		keys: [ 'ls' ],
 		path: './lib/list',
 		args: [ directory, argv.l, argv.f, argv.r ],
-		description: 'List files in the change. Options: -l detailed, -f full path, -r report to file'
+		description: {
+			en: 'List files in the change. Options: -l detailed, -f full path, -r report to file',
+			ja: '課題のファイルの一覧表示。オプション: -l 詳細表示 -f フルパス -r レポートファイル作成' }
 	},
 	{
-		keys: [ 'createdirs', 'crd' ],
+		keys: [ 'create-dirs', 'crd' ],
 		path: './lib/createDirs',
 		args: [ directory ],
-		description: 'Create directories for change folder.'
+		description: {
+			en: 'Create subdirectories in change folder.',
+			ja: '課題フォルダーのサブフォルダーを作成。' }
 	},
 	{
 		keys: [ 'stats', 's' ],
 		path: './lib/stats',
 		args: [ directory, argv.r ],
-		description: 'Write out statistics about current project.'
+		description: {
+			en: 'Write out statistics about current project.',
+			ja: 'プロジェクト統計を表示。' }
 	},
 	{
 		keys: [ 'tasks', 't' ],
 		path: './lib/tasks/tasks',
 		args: [ directory ],
-		description: 'Lists all tasks. Options: -a all'
+		description: {
+			en: 'Lists all tasks. Options: -a all',
+			ja: 'タスク一覧表示。オプション: -a 全部' }
 	},
 	{
-		keys: [ 'add-task', 't+' ],
+		keys: [ 'add-task', '+t' ],
 		path: './lib/tasks/addTask',
 		args: [ directory, argv._[1] ],
-		description: 'Adds a new task to change.'
+		description: {
+			en: 'Adds a new task to change.',
+			ja: '新規タスク作成。' }
 	},
 	{
-		keys: [ 'remove-task', 't-' ],
+		keys: [ 'remove-task', '-t' ],
 		path: './lib/tasks/removeTask',
 		args: [ directory, argv._[1] ],
-		description: 'Removes a task from change.'
+		description: {
+			en: 'Removes a task from change.',
+			ja: 'タスク排除。' }
 	},
 ]
 
@@ -95,7 +125,7 @@ function loadModule(moduleName) {
 
 		modules.forEach(module => {
 			let spaces = ' '.repeat(longestOption - module.keys.length + 2);
-			console.log('\t' + module.keys + spaces + module.description);
+			console.log('\t' + module.keys + spaces + module.description[lang]);
 		})
 	} else {
 		const version = fs.readJsonSync(path.join(__dirname, 'package.json')).version;
