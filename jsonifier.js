@@ -86,7 +86,7 @@ function loadModule(moduleName) {
 		(require(module.path))(...module.args);
 	} else if (moduleName == 'help') {
 		// Listing all command options
-		console.log('Jsonifier commands:\n');
+		console.log('Lime commands:\n');
 
 		modules.forEach(module => module.keys = module.keys.join(', '));
 		var longestOption = modules
@@ -99,8 +99,8 @@ function loadModule(moduleName) {
 		})
 	} else {
 		const version = fs.readJsonSync(path.join(__dirname, 'package.json')).version;
-		console.log('Jsonifier v' + version);
-		console.log(`For the list of commands write 'jsonifier help'`);
+		console.log('Lime v' + version);
+		console.log(`For the list of commands write 'lime help'`);
 	}
 }
 

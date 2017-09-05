@@ -1,8 +1,8 @@
 {
-  "name": "jsonifier",
+  "name": "lime",
   "version": "0.1.0",
   "bin": "./bin/jsonifier",
-  "description": "Local drive versioning for personal use",
+  "description": "Local Issue Management tool",
   "main": "jsonifier.js",
   "dependencies": {
     "archiver": "^2.0.0",
