@@ -1,5 +1,5 @@
 {
-	"MSG_WELCOME": "For the list of commands enter 'scw help'",
+	"MSG_WELCOME": "Source Code Watcher is a simple source code manager tool.\nFor the list of commands enter 'scw help'.",
 	"MSG_HELP": "scw commands:",
 	"MSG_FILE_ADDED": "File added.",
 	"MSG_CHANGES_UPDATED": "Changes file updated.",
@@ -14,8 +14,12 @@
 	"MSG_CHANGE_CREATED": "Change folder successfully created.",
 	"MSG_FIRST_ADDED": "First added on:",
 	"MSG_LAST_EDITED": "Last edited on:",
+	"MSG_EDITED_COUNT": "Added files:",
 	"MSG_WATCHING_START": "Watching for changes in",
+	"MSG_TASKS_WELCOME": "Current tasks",
+	"MSG_SAVED": "saved.",
 
+	"ERR_NO_SUCH_COMMAND": "No such command. For the list of commands enter 'scw help'",
 	"ERR_FILE_RW": "File system error.",
 	"ERR_NO_FILE": "Please enter a filename.",
 	"ERR_NOT_FOLDER": "Please enter a folder name.",
@@ -34,6 +38,9 @@
 	"ERR_NO_CHANGESFOLDER": "Changes folder not found.",
 	"ERR_FILE_NOT_IN_CHANGE": "File is not registered in the change.",
 	"ERR_CHANGE_EMPTY": "The change is empty.",
+	"ERR_NO_TASK": "Please enter a task in your second argument.",
+	"ERR_NO_TASKINDEX": "Please enter the index of a task as your second argument.",
+	"ERR_NO_TASK": "Task doesn't exist.",
 
 	"INQ_FILE_DEL": "This file has been edited. Are you sure you want to delete it (Y|N)? (don't forget the archive first)",
 	"INQ_PROJECT_NAME": "Project folder name:",

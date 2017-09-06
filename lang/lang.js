@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 
 function Lang() {
-	this.lang = 'en';
+	this.lang;
 	this.messages;
 }
 

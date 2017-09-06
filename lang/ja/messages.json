@@ -1,5 +1,5 @@
 {
-	"MSG_WELCOME": "コマンド一覧を表示するために　'scw help'　を入力してください。",
+	"MSG_WELCOME": "Source Code Watcherはシンプルなソースコード管理ツールです。\nコマンド一覧を表示するには　'scw help'　を入力してください。",
 	"MSG_HELP": "scw コマンド:",
 	"MSG_FILE_ADDED": "ファイル追加されました。",
 	"MSG_CHANGES_UPDATED": "課題ファイル更新しました。",
@@ -14,9 +14,13 @@
 	"MSG_CHANGE_CREATED": "課題フォルダー作成しました。",
 	"MSG_FIRST_ADDED": "最初の追加：",
 	"MSG_LAST_EDITED": "最後の編集：",
+	"MSG_EDITED_COUNT": "ファイル数：",
 	"MSG_WATCHING_START": "次のソースコードを監視します：",
+	"MSG_TASKS_WELCOME": "現在のタスク",
+	"MSG_SAVED": "を保存しました。",
 
-	"ERR_FILE_RW": "システムエラー発生しました。",
+	"ERR_NO_SUCH_COMMAND": "コマンドありません。コマンド一覧を表示するには　'scw help'　を入力してください。",
+	"ERR_FILE_RW": "システムエラーが発生しました。",
 	"ERR_NO_FILE": "ファイルネームを入力してください。",
 	"ERR_NOT_FOLDER": "フォルダーネームを入力してください。",
 	"ERR_NO_PROJECT": "プロジェクトフォルダーが見つかりません。",
@@ -34,6 +38,9 @@
 	"ERR_NO_CHANGESFOLDER": "Changes フォルダーが見つかれいません。",
 	"ERR_FILE_NOT_IN_CHANGE": "このファイルは登録されていません。",
 	"ERR_CHANGE_EMPTY": "課題フォルダーは空です。",
+	"ERR_NO_TASK": "タスクを入力してください。",
+	"ERR_NO_TASKINDEX": "タスクの添字を入力してください。",
+	"ERR_NO_TASK": "タスクが見つかりません。",
 
 	"INQ_FILE_DEL": "このファイルは編集済みです。さくじょしますか・ (Y|N)? (削除する前にアーカイブを作成するのをおすすめします。)",
 	"INQ_PROJECT_NAME": "プロジェクトフォルダーネーム：",

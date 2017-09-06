@@ -6,7 +6,7 @@ const argv			= parseArgs(process.argv.slice(2));
 const config    = fs.readJsonSync(path.join(__dirname, 'config.json'));
 
 const lang			= require('./lang/lang.js');
-lang.setLang(argv.lang);
+lang.setLang(argv.lang || fs.readJsonSync(path.join(__dirname, './config.json')).lang);
 
 const msg 			= lang.getMessages();
 const directory	= path.resolve(argv.d || process.cwd());
@@ -70,7 +70,7 @@ const modules = [
 	},
 	{
 		keys: [ 'create-dirs', 'crd' ],
-		path: './lib/createDirs',
+		path: './lib/create-dirs',
 		args: [ directory ],
 		description: {
 			en: 'Create subdirectories in change folder.',
@@ -94,7 +94,7 @@ const modules = [
 	},
 	{
 		keys: [ 'add-task', 't+' ],
-		path: './lib/tasks/addTask',
+		path: './lib/tasks/add-task',
 		args: [ directory, argv._[1] ],
 		description: {
 			en: 'Adds a new task to change.',
@@ -102,7 +102,7 @@ const modules = [
 	},
 	{
 		keys: [ 'remove-task', 't-' ],
-		path: './lib/tasks/removeTask',
+		path: './lib/tasks/remove-task',
 		args: [ directory, argv._[1] ],
 		description: {
 			en: 'Removes a task from change.',
@@ -114,8 +114,17 @@ function loadModule(moduleName) {
 	const module = modules.find(module => module.keys.includes(moduleName));
 	if (module) {
 		(require(module.path))(...module.args);
+	}
 
-	} else if (moduleName == 'help') {
+	else if (!moduleName) {
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
+
+		console.log(`${npmConf.name} v${npmConf.version}`);
+		console.log(msg.MSG_WELCOME);
+		return;
+	}
+
+	else if (moduleName == 'help') {
 		// Listing all command options
 		console.log(msg.MSG_HELP +'\n');
 
@@ -128,11 +137,15 @@ function loadModule(moduleName) {
 			let spaces = ' '.repeat(longest - module.keys.length + 2);
 			console.log('\t' + module.keys + spaces + module.description[lang.getLang()]);
 		})
-	} else {
+		return;
+	}
+
+	else {
 		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
 
 		console.log(`${npmConf.name} v${npmConf.version}`);
-		console.log(msg.MSG_WELCOME);
+		console.log(msg.ERR_NO_SUCH_COMMAND);
+		return;
 	}
 }
 
