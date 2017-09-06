@@ -1,17 +1,17 @@
 const parseArgs	= require('minimist');
-const fs			= require('fs-extra');
+const fs				= require('fs-extra');
 const path			= require('path');
 
 const argv			= parseArgs(process.argv.slice(2));
+const config    = fs.readJsonSync(path.join(__dirname, 'config.json'));
+
+const lang			= require('./lang/lang.js');
+lang.setLang(argv.lang);
+
+const msg 			= lang.getMessages();
 const directory	= path.resolve(argv.d || process.cwd());
-const lang			= process.env.LANGUAGE == 'ja_JP' ? 'ja' : 'en';
 
-const config		= require('./lib/config-reader');
-
-config.load('../lang/en/messages', 'messages');
-config.read('messages');
-
-const modules		= [
+const modules = [
 	{
 		keys: [ 'init' ],
 		path: './lib/init',
@@ -23,13 +23,13 @@ const modules		= [
 	{
 		keys: [ 'new', 'n' ],
 		path: './lib/new-change',
-		args: [ directory, argv._[1] ],
+		args: [ directory, argv._[1], argv.t || argv.title ],
 		description: {
 			en: 'Create a new change folder.',
 			ja: '新規課題フォルダーを作成。' }
 	},
 	{
-		keys: [ 'add', '+'],
+		keys: [ 'add', '+' ],
 		path: './lib/add-to-change',
 		args: [ directory, argv._[1] ],
 		description: {
@@ -37,7 +37,7 @@ const modules		= [
 			ja: 'ファイルを課題に追加。' }
 	},
 	{
-		keys: [ 'remove', '-'],
+		keys: [ 'remove', '-' ],
 		path: './lib/remove-from-change',
 		args: [ directory, argv._[1] ],
 		description: {
@@ -45,7 +45,7 @@ const modules		= [
 			ja: 'ファイルを課題から排除。' }
 	},
 	{
-		keys: [ 'archive', 'ar'],
+		keys: [ 'archive', 'ar' ],
 		path: './lib/archive-change',
 		args: [ directory ],
 		description: {
@@ -93,7 +93,7 @@ const modules		= [
 			ja: 'タスク一覧表示。オプション: -a 全部' }
 	},
 	{
-		keys: [ 'add-task', '+t' ],
+		keys: [ 'add-task', 't+' ],
 		path: './lib/tasks/addTask',
 		args: [ directory, argv._[1] ],
 		description: {
@@ -101,7 +101,7 @@ const modules		= [
 			ja: '新規タスク作成。' }
 	},
 	{
-		keys: [ 'remove-task', '-t' ],
+		keys: [ 'remove-task', 't-' ],
 		path: './lib/tasks/removeTask',
 		args: [ directory, argv._[1] ],
 		description: {
@@ -114,23 +114,25 @@ function loadModule(moduleName) {
 	const module = modules.find(module => module.keys.includes(moduleName));
 	if (module) {
 		(require(module.path))(...module.args);
+
 	} else if (moduleName == 'help') {
 		// Listing all command options
-		console.log('scw commands:\n');
+		console.log(msg.MSG_HELP +'\n');
 
 		modules.forEach(module => module.keys = module.keys.join(', '));
-		var longestOption = modules
+		var longest = modules
 			.map(module => module.keys.length)
 			.reduce((m1, m2) => Math.max(m1, m2));
 
 		modules.forEach(module => {
-			let spaces = ' '.repeat(longestOption - module.keys.length + 2);
-			console.log('\t' + module.keys + spaces + module.description[lang]);
+			let spaces = ' '.repeat(longest - module.keys.length + 2);
+			console.log('\t' + module.keys + spaces + module.description[lang.getLang()]);
 		})
 	} else {
-		const version = fs.readJsonSync(path.join(__dirname, 'package.json')).version;
-		console.log('scw v' + version);
-		console.log(`For the list of commands write 'scw help'`);
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
+
+		console.log(`${npmConf.name} v${npmConf.version}`);
+		console.log(msg.MSG_WELCOME);
 	}
 }
 

@@ -1,0 +1,18 @@
+{
+	"MSG_WELCOME": "For the list of commands enter 'scw help'",
+	"MSG_HELP": "scw commands:",
+	"MSG_FILE_ADDED": "File added.",
+	"MSG_CHANGES_UPDATED": "Changes file updated.",
+	"MSG_FILE_DELETED": "deleted.",
+
+	"ERR_FILE_RW": "File system error.",
+	"ERR_NO_FILE": "Please enter a filename.",
+	"ERR_NO_PROJECT": "Project folder not found.",
+	"ERR_NO_SOURCE": "Source file doesn't exist.",
+	"ERR_NOT_FILE": "The given source is not a file.",
+	"ERR_FILE_ALREADY_ADDED": "This file is already added.",
+	"ERR_NO_CHANGESFILE": "Changes.json file not found.",
+	"ERR_FILE_NOT_IN_CHANGE": "File is not registered in the change.",
+
+	"CONFIRM_FILE_DEL": "This file has been edited. Are you sure you want to delete it (Y|N)? (don't forget the archive first)"
+}

@@ -1,0 +1,5 @@
+{
+	"MSG_WELCOME": "コマンド一覧を表示するために　'scw help'　を入力してください。",
+	"MSG_HELP": "scw commands:",
+	"ERR_FILE_RW": "File r/w error"
+}
