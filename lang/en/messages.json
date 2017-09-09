@@ -16,6 +16,8 @@
 	"MSG_LAST_EDITED": "Last edited on:",
 	"MSG_EDITED_COUNT": "Added files:",
 	"MSG_WATCHING_START": "Watching for changes in",
+	"MSG_WATCHING_ADDED": "File is added to watcher list.",
+	"MSG_WATCHING_REMOVED": "File is removed from watcher list.",
 	"MSG_TASKS_WELCOME": "Current tasks",
 	"MSG_SAVED": "saved.",
 
