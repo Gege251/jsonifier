@@ -15,7 +15,9 @@
 	"MSG_FIRST_ADDED": "最初の追加：",
 	"MSG_LAST_EDITED": "最後の編集：",
 	"MSG_EDITED_COUNT": "ファイル数：",
-	"MSG_WATCHING_START": "次のソースコードを監視します：",
+	"MSG_WATCHING_START": "ソースコードを監視しています：",
+	"MSG_WATCHING_ADDED": "ファイルを監視リストに追加しました。",
+	"MSG_WATCHING_REMOVED": "ファイルを監視リストから排除しました。",
 	"MSG_TASKS_WELCOME": "現在のタスク",
 	"MSG_SAVED": "を保存しました。",
 
@@ -42,7 +44,7 @@
 	"ERR_NO_TASKINDEX": "タスクの添字を入力してください。",
 	"ERR_NO_TASK": "タスクが見つかりません。",
 
-	"INQ_FILE_DEL": "このファイルは編集済みです。さくじょしますか・ (Y|N)? (削除する前にアーカイブを作成するのをおすすめします。)",
+	"INQ_FILE_DEL": "このファイルは編集済みです。削除しますか・ (Y|N)? (削除する前にアーカイブを作成するのをおすすめします。)",
 	"INQ_PROJECT_NAME": "プロジェクトフォルダーネーム：",
 	"INQ_SRC_PATH": "プロジェクトソースコードへのパス：",
 	"INQ_SUBFOLDER_ORIGINAL": "修正前ファイルのサブフォルダー：",
