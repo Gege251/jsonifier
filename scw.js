@@ -116,7 +116,7 @@ function loadModule(moduleName) {
 		(require(module.path))(...module.args);
 	}
 
-	else if (!moduleName) {
+	else if (!moduleName && !argv.v) {
 		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
 
 		console.log(`${npmConf.name} v${npmConf.version}`);
@@ -124,7 +124,7 @@ function loadModule(moduleName) {
 		return;
 	}
 
-	else if (moduleName == 'help') {
+	else if (moduleName === 'help') {
 		// Listing all command options
 		console.log(msg.MSG_HELP +'\n');
 
@@ -138,6 +138,11 @@ function loadModule(moduleName) {
 			console.log('\t' + module.keys + spaces + module.description[lang.getLang()]);
 		})
 		return;
+	}
+
+	else if (moduleName === 'version' || argv.v) {
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
+		console.log(`${npmConf.version}`);
 	}
 
 	else {
