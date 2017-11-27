@@ -18,7 +18,6 @@
 	"MSG_WATCHING_START": "Watching for changes in",
 	"MSG_WATCHING_ADDED": "File is added to watcher list.",
 	"MSG_WATCHING_REMOVED": "File is removed from watcher list.",
-	"MSG_TASKS_WELCOME": "Current tasks",
 	"MSG_SAVED": "saved.",
   "MSG_PATCHED": "Patched.",
   "MSG_UNPATCHED": "Unpatched.",
@@ -42,9 +41,7 @@
 	"ERR_NO_CHANGESFOLDER": "Changes folder not found.",
 	"ERR_FILE_NOT_IN_CHANGE": "File is not registered in the change.",
 	"ERR_CHANGE_EMPTY": "The change is empty.",
-	"ERR_NO_TASK": "Please enter a task in your second argument.",
-	"ERR_NO_TASKINDEX": "Please enter the index of a task as your second argument.",
-	"ERR_NO_TASK": "Task doesn't exist.",
+  "ERR_LOCKED": "The change is locked (unpatched)",
 
 	"INQ_FILE_DEL": "This file has been edited. Are you sure you want to delete it (Y|N)? (don't forget the archive first)",
 	"INQ_PROJECT_NAME": "Project folder name:",

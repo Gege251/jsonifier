@@ -18,7 +18,6 @@
 	"MSG_WATCHING_START": "ソースコードを監視しています：",
 	"MSG_WATCHING_ADDED": "ファイルを監視リストに追加しました。",
 	"MSG_WATCHING_REMOVED": "ファイルを監視リストから排除しました。",
-	"MSG_TASKS_WELCOME": "現在のタスク",
 	"MSG_SAVED": "を保存しました。",
   "MSG_PATCHED": "パッチした。",
   "MSG_UNPATCHED": "アンパッチした。",
@@ -42,9 +41,7 @@
 	"ERR_NO_CHANGESFOLDER": "Changes フォルダーが見つかれいません。",
 	"ERR_FILE_NOT_IN_CHANGE": "このファイルは登録されていません。",
 	"ERR_CHANGE_EMPTY": "課題フォルダーは空です。",
-	"ERR_NO_TASK": "タスクを入力してください。",
-	"ERR_NO_TASKINDEX": "タスクの添字を入力してください。",
-	"ERR_NO_TASK": "タスクが見つかりません。",
+  "ERR_LOCKED": "課題フォルダーはロックかかっています。（アンパッチされている）",
 
 	"INQ_FILE_DEL": "このファイルは編集済みです。削除しますか・ (Y|N)? (削除する前にアーカイブを作成するのをおすすめします。)",
 	"INQ_PROJECT_NAME": "プロジェクトフォルダーネーム：",
