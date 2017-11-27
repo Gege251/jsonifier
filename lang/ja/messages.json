@@ -20,6 +20,8 @@
 	"MSG_WATCHING_REMOVED": "ファイルを監視リストから排除しました。",
 	"MSG_TASKS_WELCOME": "現在のタスク",
 	"MSG_SAVED": "を保存しました。",
+  "MSG_PATCHED": "パッチした。",
+  "MSG_UNPATCHED": "アンパッチした。",
 
 	"ERR_NO_SUCH_COMMAND": "コマンドありません。コマンド一覧を表示するには　'scw help'　を入力してください。",
 	"ERR_FILE_RW": "システムエラーが発生しました。",

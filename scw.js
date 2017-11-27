@@ -85,29 +85,21 @@ const modules = [
 			ja: 'プロジェクト統計を表示。' }
 	},
 	{
-		keys: [ 'tasks', 't' ],
-		path: './lib/tasks/tasks',
+		keys: [ 'patch', 'p' ],
+		path: './lib/patch',
 		args: [ directory ],
 		description: {
-			en: 'Lists all tasks. Options: -a all',
-			ja: 'タスク一覧表示。オプション: -a 全部' }
+			en: 'Applies changes to source',
+			ja: '変更をソースに反映' }
 	},
 	{
-		keys: [ 'add-task', 't+' ],
-		path: './lib/tasks/add-task',
-		args: [ directory, argv._[1] ],
+		keys: [ 'unpatch', 'unp' ],
+		path: './lib/unpatch',
+		args: [ directory ],
 		description: {
-			en: 'Adds a new task to change.',
-			ja: '新規タスク作成。' }
-	},
-	{
-		keys: [ 'remove-task', 't-' ],
-		path: './lib/tasks/remove-task',
-		args: [ directory, argv._[1] ],
-		description: {
-			en: 'Removes a task from change.',
-			ja: 'タスク排除。' }
-	},
+			en: 'Rollback to original',
+			ja: '修正前の状態にロールバック' }
+	}
 ]
 
 function loadModule(moduleName) {
