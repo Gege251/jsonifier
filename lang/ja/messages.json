@@ -33,6 +33,7 @@
 	"ERR_NOT_PATH": "有効なパスを入力してください。",
 	"ERR_NOT_PATHS": "有効なパスを入力してください。",
 	"ERR_FILE_ALREADY_ADDED": "このファイルは既に追加されています。",
+	"ERR_FILE_ALREADY_EXISTS": "このファイルは既に存在しています。",
 	"ERR_PROJECT_ALREADY_EXISTS": "プロジェクトは既に存在しています。",
 	"ERR_CHANGE_ALREADY_EXISTS": "課題フォルダーが既に存在しています。",
 	"ERR_INVALID_NAME": "ネームが無効です。",

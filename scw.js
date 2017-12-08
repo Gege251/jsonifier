@@ -21,7 +21,7 @@ const modules = [
 			ja: '新規プロジェクトフォルダーを作成。' }
 	},
 	{
-		keys: [ 'new', 'n' ],
+		keys: [ 'new-change', 'nc' ],
 		path: './lib/new-change',
 		args: [ directory, argv._[1], argv.t || argv.title ],
 		description: {
@@ -35,6 +35,14 @@ const modules = [
 		description: {
 			en: 'Add a new file to change.',
 			ja: 'ファイルを課題に追加。' }
+	},
+	{
+		keys: [ 'new', '.+' ],
+		path: './lib/newfile-to-change',
+		args: [ directory, argv._[1] ],
+		description: {
+			en: 'Create a new file to change.',
+			ja: '新規ファイルを課題に追加。' }
 	},
 	{
 		keys: [ 'remove', '-' ],

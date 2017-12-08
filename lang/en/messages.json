@@ -33,6 +33,7 @@
 	"ERR_NOT_PATH": "Please enter a valid path.",
 	"ERR_NOT_PATHS": "Please enter valid paths.",
 	"ERR_FILE_ALREADY_ADDED": "This file is already added.",
+	"ERR_FILE_ALREADY_EXISTS": "This file already exists.",
 	"ERR_PROJECT_ALREADY_EXISTS": "Project folder already exists.",
 	"ERR_CHANGE_ALREADY_EXISTS": "Change folder already exists",
 	"ERR_INVALID_NAME": "Invalid name.",
