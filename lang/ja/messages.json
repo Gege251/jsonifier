@@ -15,6 +15,7 @@
 	"MSG_FIRST_ADDED": "最初の追加：",
 	"MSG_LAST_EDITED": "最後の編集：",
 	"MSG_EDITED_COUNT": "ファイル数：",
+  "MSG_ISLOCKED": "ロック中",
 	"MSG_WATCHING_START": "ソースコードを監視しています：",
 	"MSG_WATCHING_ADDED": "ファイルを監視リストに追加しました。",
 	"MSG_WATCHING_REMOVED": "ファイルを監視リストから排除しました。",
