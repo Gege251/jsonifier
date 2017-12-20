@@ -14,7 +14,7 @@ const directory	= path.resolve(argv.d || process.cwd());
 const modules = [
 	{
 		keys: [ 'init' ],
-		path: './lib/init',
+		path: './src/init',
 		args: [ directory ],
 		description: {
 			en: 'Initialize project folder.',
@@ -22,7 +22,7 @@ const modules = [
 	},
 	{
 		keys: [ 'new-change', 'nc' ],
-		path: './lib/new-change',
+		path: './src/new-change',
 		args: [ directory, argv._[1], argv.t || argv.title ],
 		description: {
 			en: 'Create a new change folder.',
@@ -30,7 +30,7 @@ const modules = [
 	},
 	{
 		keys: [ 'add', '+' ],
-		path: './lib/add-to-change',
+		path: './src/add-to-change',
 		args: [ directory, argv._[1] ],
 		description: {
 			en: 'Add a new file to change.',
@@ -38,7 +38,7 @@ const modules = [
 	},
 	{
 		keys: [ 'new', '.+' ],
-		path: './lib/newfile-to-change',
+		path: './src/newfile-to-change',
 		args: [ directory, argv._[1] ],
 		description: {
 			en: 'Create a new file to change.',
@@ -46,7 +46,7 @@ const modules = [
 	},
 	{
 		keys: [ 'remove', '-' ],
-		path: './lib/remove-from-change',
+		path: './src/remove-from-change',
 		args: [ directory, argv._[1] ],
 		description: {
 			en: 'Remove a file from change',
@@ -54,7 +54,7 @@ const modules = [
 	},
 	{
 		keys: [ 'archive', 'ar' ],
-		path: './lib/archive-change',
+		path: './src/archive-change',
 		args: [ directory ],
 		description: {
 			en: 'Archive a change to zip file.',
@@ -62,7 +62,7 @@ const modules = [
 	},
 	{
 		keys: [ 'watcher', 'w' ],
-		path: './lib/watcher',
+		path: './src/watcher',
 		args: [ directory ],
 		description: {
 			en: 'Watch source code for changes.',
@@ -70,7 +70,7 @@ const modules = [
 	},
 	{
 		keys: [ 'ls' ],
-		path: './lib/list',
+		path: './src/list',
 		args: [ directory, argv.l, argv.f, argv.r ],
 		description: {
 			en: 'List files in the change. Options: -l detailed, -f full path, -r report to file',
@@ -78,7 +78,7 @@ const modules = [
 	},
 	{
 		keys: [ 'create-dirs', 'crd' ],
-		path: './lib/create-dirs',
+		path: './src/create-dirs',
 		args: [ directory ],
 		description: {
 			en: 'Create subdirectories in change folder.',
@@ -86,7 +86,7 @@ const modules = [
 	},
 	{
 		keys: [ 'stats', 's' ],
-		path: './lib/stats',
+		path: './src/stats',
 		args: [ directory, argv.r ],
 		description: {
 			en: 'Write out statistics about current project.',
@@ -94,7 +94,7 @@ const modules = [
 	},
 	{
 		keys: [ 'patch', 'p' ],
-		path: './lib/patch',
+		path: './src/patch',
 		args: [ directory ],
 		description: {
 			en: 'Applies changes to source',
@@ -102,7 +102,7 @@ const modules = [
 	},
 	{
 		keys: [ 'unpatch', 'unp' ],
-		path: './lib/unpatch',
+		path: './src/unpatch',
 		args: [ directory ],
 		description: {
 			en: 'Rollback to original',

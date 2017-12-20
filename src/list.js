@@ -1,8 +1,9 @@
-const fs = require('fs-extra');
-const path = require('path');
-const chalk = require('chalk');
+const fs    = require('fs-extra')
+const path  = require('path')
+const chalk = require('chalk')
+const chman = require('../lib/change-manager.js')
 
-const msg	= require('../lang/lang.js').getMessages();
+const msg	  = require('../lang/lang.js').getMessages();
 
 const comparePath = function(f1, f2, fullPath) {
 	if (fullPath) {
@@ -13,10 +14,9 @@ const comparePath = function(f1, f2, fullPath) {
 }
 
 module.exports = function(directory, verbose, fullPath, report) {
-	const changesFile = path.join(directory, 'changes.json');
 
-	fs.open(changesFile, 'r').then(file => {
-		fs.readJson(file).then(changesConf => {
+  chman.read(directory)
+    .then(changesConf => {
 			var files = changesConf.changes;
 			let output = [];
 
@@ -36,12 +36,6 @@ module.exports = function(directory, verbose, fullPath, report) {
 						output.push('\t' + file.added);
 						output.push('\t' + file.changed);
 
-						// if (file.changes) {
-						// 	file.changes.forEach(change => {
-						// 		output.push('\t' + change.lines);
-						// 		output.push('\t\t' + change.explanation);
-						// 	})
-						// }
 					} else {
 						output.push(chalk.green(filePath));
 					}
@@ -55,8 +49,6 @@ module.exports = function(directory, verbose, fullPath, report) {
 			} else {
 					console.log(output.join('\r\n'));
 			}
-		})
-		.catch(err => console.log(err));
 	})
 	.catch(err => console.log(msg.ERR_NO_CHANGESFILE));
 }
