@@ -5,10 +5,10 @@ module.exports = {
   create,
   ensure,
   read,
-  readOrCreate,
   addFile,
   removeFile,
   updateFile,
+  fileExists,
   lock,
   unlock,
   rename,
@@ -25,28 +25,21 @@ function create(chDir) {
   }
   getChangesFile(chDir)
   return fs.open(getChangesFile(chDir), 'wx')
-    .then(chFile => fs.writeJson(newChanges))
+    .then(chFile => fs.writeJson(chFile, newChanges))
     .then(_ => newChanges )
 }
 
-// Check if change file exists
+// If no change file is found create a new one in the current directory
 function ensure(chDir) {
-	return findChangesFile(chDir) != ''
+  if (findChangesFile(chDir) === '') {
+    create(chDir)
+  }
 }
 
 // Read the contents of the change file
 function read(chDir) {
 	return fs.open(findChangesFile(chDir), 'r')
     .then(chFile => fs.readJson(chFile))
-}
-
-// Read the contents of the change file or create a new if doesn't exist
-function readOrCreate(chDir) {
-  if (ensure(chDir)) {
-    return read(chDir)
-  } else {
-    return create(chDir)
-  }
 }
 
 // Add a new file to the changes list
@@ -100,6 +93,12 @@ function updateFile(chDir) {
   update(chDir, change)
 }
 
+// Checks if the file exists in the change list
+async function fileExists(chDir, fileSrc) {
+  const changes = (await read(chDir)).changes
+	return changes.some(file => path.join(file.path, file.filename) === path.join(fileSrc) )
+}
+
 // Set the lock in the change
 function lock(chDir) {
   const change = ch => { return {...ch, lock: true } }
@@ -131,9 +130,9 @@ function changeTitle(chDir, newTitle) {
 // Update and overwrite the change file
 // The change argument is a function which is applied to the original
 // contents of the file
-function update(chDir, change) {
-  const newCh = read(chDir).then(ch => change(ch))
-	fs.writeJson(findChangesFile(chDir), newCh, {spaces: 4})
+async function update(chDir, change) {
+  const newCh = await read(chDir).then(ch => change(ch))
+	return fs.writeJson(findChangesFile(chDir), newCh, {spaces: 4})
 }
 
 // Create the full path of the changes file

@@ -1,5 +1,5 @@
 const fs    = require('fs-extra');
-const chman = require('../lib/change-manager')
+const chman = require('./utils/change-manager')
 const path  = require('path');
 const chalk = require('chalk');
 const { List, fromJS } = require('immutable')

@@ -1,46 +1,38 @@
-const fs = require('fs-extra');
-const path = require('path');
+const fs    = require('fs-extra')
+const chman = require('./utils/change-manager')
+const path  = require('path')
 
-const msg	= require('../lang/lang.js').getMessages();
+const msg	  = require('../lang/lang.js').getMessages()
 
-module.exports = function(directory, fileSrc) {
-	const changesFile = path.join(directory, 'changes.json');
-	const deployConfFile = path.join(directory, '../.deployconf');
+module.exports = async function(directory, fileSrc) {
+	const deployConfFile = path.join(directory, '../.deployconf')
 
 	if (!fileSrc) {
-		console.log(msg.ERR_NO_FILE);
-		return Promise.resolve(false);
+		console.log(msg.ERR_NO_FILE)
+		return Promise.resolve(false)
 	}
 
 	if (!fs.existsSync(deployConfFile)) {
 		console.log(msg.ERR_NO_PROJECT)
-		return Promise.resolve(false);
+		return Promise.resolve(false)
 	}
 	var deployConf = fs.readJsonSync(deployConfFile);
 
 	if (!fs.existsSync(path.join(deployConf.source, fileSrc))) {
-		console.log(msg.ERR_NO_SOURCE);
-		return Promise.resolve(false);
+		console.log(msg.ERR_NO_SOURCE)
+		return Promise.resolve(false)
 	}
 
 	if (!fs.lstatSync(path.join(deployConf.source, fileSrc)).isFile() ) {
-		console.log(msg.ERR_NOT_FILE);
-		return Promise.resolve(false);
+		console.log(msg.ERR_NOT_FILE)
+		return Promise.resolve(false)
 	}
 
-	var changesConf;
-	if (fs.existsSync(changesFile)) {
-		changesConf = fs.readJsonSync(changesFile);
-	} else {
-		changesConf.name = path.basename(dirname);
-    changesConf.title = "";
-		changesConf.changes = [];
-	}
-	var changes = changesConf.changes;
+  await chman.ensure(directory)
 
-	if (changes.some(file => path.join(file.path, file.filename) === path.join(fileSrc) )) {
-		console.log(msg.ERR_FILE_ALREADY_ADDED);
-		return Promise.resolve(false);
+	if (await chman.fileExists(directory, fileSrc)) {
+		console.log(msg.ERR_FILE_ALREADY_ADDED)
+		return Promise.resolve(false)
 	}
 
 	return fs.mkdirs(path.join(directory, deployConf.originalVersion, path.dirname(fileSrc)))
@@ -48,25 +40,18 @@ module.exports = function(directory, fileSrc) {
 		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.originalVersion, fileSrc)))
 		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc)))
 		.then(_ => {
-			console.log(msg.MSG_FILE_ADDED);
+			console.log(msg.MSG_FILE_ADDED)
 
-			var currentTime = new Date().toLocaleString();
-			changes.push({
-				filename: path.basename(fileSrc),
-				path: path.dirname(fileSrc),
-				added: currentTime,
-				changed: currentTime,
-			})
+      return chman.addFile(directory, fileSrc)
 
-			return fs.writeJson(changesFile, changesConf, {spaces: 4})
 		})
 	 	.then(_ => {
-			console.log(msg.MSG_CHANGES_UPDATED);
+			console.log(msg.MSG_CHANGES_UPDATED)
 			return Promise.resolve(true)
 		})
 		.catch(err => {
 			console.log(msg.ERR_FILE_RW)
 			return Promise.resolve(false)
-		});
+		})
 
 }

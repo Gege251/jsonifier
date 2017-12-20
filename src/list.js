@@ -1,7 +1,7 @@
 const fs    = require('fs-extra')
 const path  = require('path')
 const chalk = require('chalk')
-const chman = require('../lib/change-manager.js')
+const chman = require('./utils/change-manager')
 
 const msg	  = require('../lang/lang.js').getMessages();
 
