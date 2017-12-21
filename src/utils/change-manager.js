@@ -14,14 +14,15 @@ module.exports = {
   lock,
   unlock,
   rename,
-  changeTitle
+  changeTitle,
+  chFileName
 }
 
 // Create a new change file
-function create(chDir) {
+function create(chDir, name, title = '') {
   const newChanges = {
-    name    : path.basename(chDir),
-    title   : '',
+    name,
+    title,
     changes : [],
     lock    : false
   }
@@ -34,7 +35,7 @@ function create(chDir) {
 // If no change file is found create a new one in the current directory
 function ensure(chDir) {
   if (! exists(chDir)) {
-    create(chDir)
+    create(path.basename(chDir))
   } 
 }
 
@@ -137,6 +138,10 @@ function changeTitle(chDir, newTitle) {
   update(chDir, change)
 }
 
+function chFileName() {
+  return fs.readJsonSync(path.join(__dirname, '../../config.json')).changesFile.filename
+}
+
 //
 // Not exported functions
 //
@@ -151,7 +156,7 @@ async function update(chDir, change) {
 
 // Create the full path of the changes file
 function getChangesFile(chDir) {
-	return path.join(chDir, 'changes.json')
+	return path.join(chDir, chFileName())
 }
 
 // Find the changes file in current directory, or any of its parents
@@ -165,3 +170,4 @@ function findChangesFile(chDir) {
     return findChangesFile(path.dirname(chDir))
   }
 }
+

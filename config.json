@@ -1,3 +1,11 @@
 {
-	"lang": "ja"
+	"lang": "ja",
+  "deployconfFile": {
+    "filename": ".deployconf",
+    "filetype": "json"
+  },
+  "changesFile": {
+    "filename": "changes.json",
+    "filetype": "json"
+  }
 }

@@ -2,24 +2,24 @@ const fs       = require('fs-extra')
 const path     = require('path')
 const readline = require('readline')
 const ch       = require('./utils/change-manager')
+const dp       = require('./utils/deployconf-manager')
 
-const msg      = require('../lang/lang.js').getMessages();
+const msg      = require('../lang/lang.js').getMessages()
 
 module.exports = removeFromChange
 
 async function removeFromChange(wdir, fileDel) {
-	const deployConfFile = path.join(wdir, '../.deployconf')
 
 	if (!fileDel) {
 		console.log(msg.ERR_NO_FILE)
 		return Promise.resolve(false)
 	}
 
-	if (!fs.existsSync(deployConfFile)) {
+	if (! dp.exists(wdir)) {
 		console.log(msg.ERR_NO_PROJECT)
 		return Promise.resolve(false)
 	}
-	const deployConf = fs.readJsonSync(deployConfFile);
+	const dpConf = await dp.read(wdir)
 
   await ch.ensure(wdir)
 
@@ -55,21 +55,21 @@ async function removeFromChange(wdir, fileDel) {
 	async function removeFile() {
     try {
       const dirs = [
-          fs.remove(path.join(wdir, deployConf.originalVersion, fileDel)),
-          fs.remove(path.join(wdir, deployConf.editedVersion, fileDel))
+          fs.remove(path.join(wdir, dpConf.originalVersion, fileDel)),
+          fs.remove(path.join(wdir, dpConf.editedVersion, fileDel))
       ]
 
       await Promise.all(dirs)
       console.log(fileDel, msg.MSG_FILE_DELETED);
 
       rmdirsRecur(
-        path.join(wdir, deployConf.originalVersion), 
-        path.join(wdir, deployConf.originalVersion, path.dirname(fileDel))
+        path.join(wdir, dpConf.originalVersion), 
+        path.join(wdir, dpConf.originalVersion, path.dirname(fileDel))
       )
 
       rmdirsRecur(
-        path.join(wdir, deployConf.editedVersion), 
-        path.join(wdir, deployConf.editedVersion, path.dirname(fileDel))
+        path.join(wdir, dpConf.editedVersion), 
+        path.join(wdir, dpConf.editedVersion, path.dirname(fileDel))
       )
 
       ch.removeFile(wdir, fileDel)

@@ -1,38 +1,46 @@
-const fs        = require('fs-extra');
-const path      = require('path');
-const createDirs = require('./create-dirs');
+const fs         = require('fs-extra')
+const ch         = require('./utils/change-manager')
+const dp         = require('./utils/deployconf-manager')
+const path       = require('path')
+const createDirs = require('./create-dirs')
 
-const msg	= require('../lang/lang.js').getMessages();
+const msg	= require('../lang/lang.js').getMessages()
 
-module.exports = function(directory, changeName, title) {
-	const deployConfFile = path.join(directory, '.deployconf');
+module.exports = newChange
 
-  if (!changeName) {
-    console.log(msg.ERR_NO_CHANGE_NAME);
-    return;
+async function newChange (wdir, chName, chTitle) {
+
+  if (!chName) {
+    console.log(msg.ERR_NO_CHANGE_NAME)
+    return
   }
 
-  if (!fs.existsSync(deployConfFile)) {
-		console.log(msg.ERR_NO_PROJECT);
-		return;
+	if (! dp.exists(wdir)) {
+		console.log(msg.ERR_NO_PROJECT)
+		return Promise.resolve(false)
 	}
+	const dpConf = await dp.read(wdir)
 
-  if ( ! /^[^<>:"\\\/\|\?\*]+$/.test(changeName) ) {
-    console.log(msg.ERR_INVALID_NAME);
-    return;
+  if ( ! /^[^<>:"\\\/\|\?\*]+$/.test(chName) ) {
+    console.log(msg.ERR_INVALID_NAME)
+    return
   }
 
-  var changePath = path.join(directory, changeName);
+  const chPath = path.join(wdir, chName)
 
-  if (fs.existsSync(changePath)) {
-    console.log(msg.ERR_CHANGE_ALREADY_EXISTS);
-    return;
+  if (ch.exists(wdir)) {
+    console.log(msg.ERR_CHANGE_ALREADY_EXISTS)
+    return
   }
 
-  fs.mkdirs(changePath)
-    .then(fs.writeJson(path.join(changePath, 'changes.json'), { name: changeName, title: title, changes: [] }, {spaces: 4} ))
-    .then(_ => console.log(msg.MSG_CHANGE_CREATED))
-		.then(createDirs(path.join(directory, changeName)))
-    .catch(err => console.log(msg.ERR_FILE_RW));
+  try {
+    await fs.mkdirs(chPath)
+    await ch.create(chPath, chName, chTitle) 
+    console.log(msg.MSG_CHANGE_CREATED)
+    createDirs(path.join(chPath))
+  } catch(e) {
+    console.log(e)
+    console.log(msg.ERR_FILE_RW)
+  }
 
 }

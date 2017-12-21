@@ -1,36 +1,34 @@
-const fs    = require('fs-extra');
-const chman = require('./utils/change-manager')
-const path  = require('path');
-const chalk = require('chalk');
+const fs    = require('fs-extra')
+const ch    = require('./utils/change-manager')
+const dp    = require('./utils/deployconf-manager')
+const path  = require('path')
+const chalk = require('chalk')
 const { List, fromJS } = require('immutable')
 
-const msg	= require('../lang/lang.js').getMessages();
+const msg	= require('../lang/lang.js').getMessages()
 
 module.exports = stats
 
 async function stats (wdir, report) {
-  const orderBy = 'firstDate';
+  const orderBy    = 'firstDate'
+  const projectDir = dp.findProjectDir(wdir)
 
-  const projectDir = findProjectDir(wdir)
-
-	const deployConfFile = path.join(projectDir, '.deployconf');
-
-	if (!fs.existsSync(deployConfFile)) {
+	if (! dp.exists(wdir)) {
 		console.log(msg.ERR_NO_PROJECT)
-		return;
+		return Promise.resolve(false)
 	}
-	const deployConf = fs.readJsonSync(deployConfFile);
+	const dpConf = await dp.read(wdir)
 
-  // Reading subdirectories and looking for changes.json files
+  // Reading subdirectories and looking for changes files
   const chdirs = await fs.readdir(projectDir)
 
-  // Reading all changes.json files asyncronously
+  // Reading every changes file asyncronously
   const chdocs = chdirs.filter(chdir =>
-          chdir != '.deployconf'
-          && chdir != deployConf.archive
+          chdir != dp.dpFileName()
+          && chdir != dpConf.archive
           && fs.lstatSync(path.join(projectDir, chdir)).isDirectory()
-          && fs.readdirSync(path.join(projectDir, chdir)).includes('changes.json')
-          ).map(chdir => chman.read(path.join(projectDir, chdir)))
+          && fs.readdirSync(path.join(projectDir, chdir)).includes(ch.chFileName())
+          ).map(chdir => ch.read(path.join(projectDir, chdir)))
 
   // Get the first add date and the last edit date of changes
   const changes = fromJS(await Promise.all(chdocs))
@@ -52,7 +50,7 @@ async function stats (wdir, report) {
 
     // Creating output
     if (report) {
-      chalk.enabled = false;
+      chalk.enabled = false
     }
 
     const output = 
@@ -69,20 +67,9 @@ async function stats (wdir, report) {
     if (report) {
       fs.writeFile(path.join(wdir, 'report.txt'), output.join('\r\n'))
         .then(console.log(msg.MSG_REPORT_CREATED))
-        .catch(err => console.log(msg.ERR_FILE_RW));
+        .catch(err => console.log(msg.ERR_FILE_RW))
     } else {
-      console.log(output.join('\r\n'));
+      console.log(output.join('\r\n'))
     }
 
 }
-
-function findProjectDir(directory) {
-  if (directory === '/' || directory === '') {
-    return ''
-  } else if (fs.existsSync(path.join(directory, '.deployconf'))) {
-    return directory
-  } else {
-    return findProjectDir(path.dirname(directory))
-  }
-}
-
