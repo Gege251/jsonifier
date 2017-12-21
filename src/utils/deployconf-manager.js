@@ -5,6 +5,7 @@ module.exports = {
   ensure,
   exists,
   read,
+  readSync,
   findDeployconfFile,
   findProjectDir,
   dpFileName
@@ -26,6 +27,11 @@ function exists(dpDir) {
 function read(dpDir) {
 	return fs.open(findDeployconfFile(dpDir), 'r')
     .then(chFile => fs.readJson(chFile))
+}
+
+// Read the contents of the deployconf file
+function readSync(dpDir) {
+	return fs.readJsonSync(findDeployconfFile(dpDir))
 }
 
 // Find the deployconf file in current directory, or any of its parents

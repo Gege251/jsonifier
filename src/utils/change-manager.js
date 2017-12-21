@@ -1,5 +1,7 @@
 const fs   = require('fs-extra')
+const dp   = require('./deployconf-manager')
 const path = require('path')
+const yaml = require('js-yaml')
 
 module.exports = {
   create,
@@ -45,9 +47,15 @@ function exists(chDir) {
 }
 
 // Read the contents of the change file
-function read(chDir) {
-	return fs.open(findChangesFile(chDir), 'r')
-    .then(chFile => fs.readJson(chFile))
+async function read(chDir) {
+  const chContent = await fs.readFile(findChangesFile(chDir))
+  const fileType  = chFileType(chDir)
+  const unpack    = {
+    'json': content => JSON.parse(content),
+    'yaml': content => yaml.safeLoad(content)
+  }
+  return (unpack[fileType] || JSON.parse)(chContent)
+    
 }
 
 // Add a new file to the changes list
@@ -84,8 +92,8 @@ function removeFile(chDir, fileDel) {
 // Update the change date of a file in the changes list
 function updateFile(chDir, fileSrc) {
   const currentTime = new Date().toLocaleString()
-  const change = ch => {
-    const chIdx = ch.changes.findIndex(file => path.join(file.path, file.filename) === path.join(fileSrc));
+  const change      = ch => {
+  const chIdx       = ch.changes.findIndex(file => path.join(file.path, file.filename) === path.join(fileSrc));
     if (chIdx !== -1) {
       return { ...ch,
         changes: [
@@ -138,8 +146,12 @@ function changeTitle(chDir, newTitle) {
   update(chDir, change)
 }
 
-function chFileName() {
-  return fs.readJsonSync(path.join(__dirname, '../../config.json')).changesFile.filename
+function chFileName(chDir) {
+  try {
+    return dp.readSync(chDir).changesFile.filename
+  } catch(e) {
+    return fs.readJsonSync(path.join(__dirname, '../../config.json')).changesFile.filename
+  }
 }
 
 //
@@ -147,16 +159,21 @@ function chFileName() {
 //
 
 // Update and overwrite the change file
-// The change argument is a function which is applied to the original
-// contents of the file
+// The change argument will be applied to the original change object
 async function update(chDir, change) {
-  const newCh = await read(chDir).then(ch => change(ch))
-	return fs.writeJson(findChangesFile(chDir), newCh, {spaces: 4})
+  const newCh    = await read(chDir).then(ch => change(ch))
+  const fileType = chFileType(chDir)
+  const pack     = {
+    'json': content => JSON.stringify(content, null, 4),
+    'yaml': content => yaml.safeDump(content)
+  }
+  const chContent = (pack[fileType] || JSON.stringify)(newCh)
+	return fs.writeFile(findChangesFile(chDir), chContent, 'utf8')
 }
 
 // Create the full path of the changes file
 function getChangesFile(chDir) {
-	return path.join(chDir, chFileName())
+	return path.join(chDir, chFileName(chDir))
 }
 
 // Find the changes file in current directory, or any of its parents
@@ -171,3 +188,10 @@ function findChangesFile(chDir) {
   }
 }
 
+function chFileType(chDir) {
+  try {
+    return dp.readSync(chDir).changesFile.filetype
+  } catch(e) {
+    return fs.readJsonSync(path.join(__dirname, '../../config.json')).changesFile.filetype
+  }
+}

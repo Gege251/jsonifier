@@ -27,7 +27,7 @@ async function stats (wdir, report) {
           chdir != dp.dpFileName()
           && chdir != dpConf.archive
           && fs.lstatSync(path.join(projectDir, chdir)).isDirectory()
-          && fs.readdirSync(path.join(projectDir, chdir)).includes(ch.chFileName())
+          && fs.readdirSync(path.join(projectDir, chdir)).includes(ch.chFileName(wdir))
           ).map(chdir => ch.read(path.join(projectDir, chdir)))
 
   // Get the first add date and the last edit date of changes
