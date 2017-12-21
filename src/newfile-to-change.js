@@ -1,65 +1,58 @@
-const fs = require('fs-extra');
-const path = require('path');
+const fs   = require('fs-extra')
+const ch   = require('./utils/change-manager')
+const path = require('path')
 
-const msg	= require('../lang/lang.js').getMessages();
+const msg  = require('../lang/lang.js').getMessages()
 
-module.exports = function(directory, fileSrc) {
-	const changesFile = path.join(directory, 'changes.json');
-	const deployConfFile = path.join(directory, '../.deployconf');
+module.exports = newFileToChange
+
+async function newFileToChange (wdir, fileSrc) {
+	const deployConfFile = path.join(wdir, '../.deployconf')
 
 	if (!fileSrc) {
-		console.log(msg.ERR_NO_FILE);
-		return Promise.resolve(false);
+		console.log(msg.ERR_NO_FILE)
+		return Promise.resolve(false)
 	}
 
 	if (!fs.existsSync(deployConfFile)) {
 		console.log(msg.ERR_NO_PROJECT)
-		return Promise.resolve(false);
+		return Promise.resolve(false)
 	}
-	var deployConf = fs.readJsonSync(deployConfFile);
+	const deployConf = fs.readJsonSync(deployConfFile)
 
 	if (fs.existsSync(path.join(deployConf.source, fileSrc))) {
-		console.log(msg.ERR_FILE_ALREADY_EXISTS);
-		return Promise.resolve(false);
+		console.log(msg.ERR_FILE_ALREADY_EXISTS)
+		return Promise.resolve(false)
 	}
 
+  // Prepare directories in source
   fs.mkdirsSync(path.join(deployConf.source, path.dirname(fileSrc)))
+  // Make an empty file
   fs.closeSync(fs.openSync(path.join(deployConf.source, fileSrc), 'a'))
 
-	var changesConf;
-	if (fs.existsSync(changesFile)) {
-		changesConf = fs.readJsonSync(changesFile);
-	} else {
-		changesConf.name = path.basename(dirname);
-    changesConf.title = "";
-		changesConf.changes = [];
-	}
-	var changes = changesConf.changes;
+  await ch.ensure(wdir)
 
-	return fs.mkdirs(path.join(directory, deployConf.originalVersion, path.dirname(fileSrc)))
-		.then(fs.mkdirs(path.join(directory, deployConf.editedVersion, path.dirname(fileSrc))))
-		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.originalVersion, fileSrc)))
-		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc)))
-		.then(_ => {
-			console.log(msg.MSG_FILE_ADDED);
+  try {
+    const dirs = [
+      fs.mkdirs(path.join(wdir, deployConf.originalVersion, path.dirname(fileSrc))),
+      fs.mkdirs(path.join(wdir, deployConf.editedVersion, path.dirname(fileSrc)))
+    ]
+    await Promise.all(dirs)
+    const files = [
+      fs.copy(path.join(deployConf.source, fileSrc), path.join(wdir, deployConf.originalVersion, fileSrc)),
+      fs.copy(path.join(deployConf.source, fileSrc), path.join(wdir, deployConf.editedVersion, fileSrc))
+    ]
+    await Promise.all(files)
 
-			var currentTime = new Date().toLocaleString();
-			changes.push({
-				filename: path.basename(fileSrc),
-				path: path.dirname(fileSrc),
-				added: currentTime,
-				changed: currentTime,
-			})
+    console.log(msg.MSG_FILE_ADDED)
 
-			return fs.writeJson(changesFile, changesConf, {spaces: 4})
-		})
-	 	.then(_ => {
-			console.log(msg.MSG_CHANGES_UPDATED);
-			return Promise.resolve(true)
-		})
-		.catch(err => {
-			console.log(msg.ERR_FILE_RW)
-			return Promise.resolve(false)
-		});
+    ch.addFile(wdir, fileSrc)
+    console.log(msg.MSG_CHANGES_UPDATED)
+    return Promise.resolve(true)
+
+  } catch(e) {
+    console.log(msg.ERR_FILE_RW)
+    return Promise.resolve(false)
+  };
 
 }

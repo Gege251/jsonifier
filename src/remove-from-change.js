@@ -52,32 +52,33 @@ async function removeFromChange(wdir, fileDel) {
 		return removeFile()
 	}
 
-	function removeFile() {
-		return fs.remove(path.join(wdir, deployConf.originalVersion, fileDel))
-			.then(fs.remove(path.join(wdir, deployConf.editedVersion, fileDel)))
-			.then(() => {
-				console.log(fileDel, msg.MSG_FILE_DELETED);
+	async function removeFile() {
+    try {
+      const dirs = [
+          fs.remove(path.join(wdir, deployConf.originalVersion, fileDel)),
+          fs.remove(path.join(wdir, deployConf.editedVersion, fileDel))
+      ]
 
-        rmdirsRecur(
-          path.join(wdir, deployConf.originalVersion), 
-          path.join(wdir, deployConf.originalVersion, path.dirname(fileDel))
-        )
+      await Promise.all(dirs)
+      console.log(fileDel, msg.MSG_FILE_DELETED);
 
-        rmdirsRecur(
-          path.join(wdir, deployConf.editedVersion), 
-          path.join(wdir, deployConf.editedVersion, path.dirname(fileDel))
-        )
+      rmdirsRecur(
+        path.join(wdir, deployConf.originalVersion), 
+        path.join(wdir, deployConf.originalVersion, path.dirname(fileDel))
+      )
 
-        return ch.removeFile(wdir, fileDel)
-			})
-			.then(() => {
-				console.log(msg.MSG_CHANGES_UPDATED);
-				return Promise.resolve(true);
-			})
-			.catch(() => {
-				console.log(msg.ERR_FILE_RW)
-				return Promise.resolve(false);
-			});
+      rmdirsRecur(
+        path.join(wdir, deployConf.editedVersion), 
+        path.join(wdir, deployConf.editedVersion, path.dirname(fileDel))
+      )
+
+      ch.removeFile(wdir, fileDel)
+      console.log(msg.MSG_CHANGES_UPDATED);
+      return Promise.resolve(true);
+    } catch(e) {
+      console.log(msg.ERR_FILE_RW)
+      return Promise.resolve(false);
+    }
 
 	}
 }

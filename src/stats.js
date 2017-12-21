@@ -29,9 +29,8 @@ async function stats (wdir, report) {
           chdir != '.deployconf'
           && chdir != deployConf.archive
           && fs.lstatSync(path.join(projectDir, chdir)).isDirectory()
-          && fs.readdirSync(path.join(projectDir, chdir)).includes('changes.json') )
-        .map(chdir =>
-          chman.read(path.join(projectDir, chdir)))
+          && fs.readdirSync(path.join(projectDir, chdir)).includes('changes.json')
+          ).map(chdir => chman.read(path.join(projectDir, chdir)))
 
   // Get the first add date and the last edit date of changes
   const changes = fromJS(await Promise.all(chdocs))
@@ -40,7 +39,7 @@ async function stats (wdir, report) {
               chFile.get('changes')
                 .map(file => new Date(file.get('added')))
                 .reduce((added1, added2) => Math.min(added1, added2))
-              ))
+            ))
         .map(chFile => chFile.set('lastDate',
           !chFile.get('changes') ? null :
             chFile.get('changes')

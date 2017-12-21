@@ -25,7 +25,7 @@ async function unpatch(wdir) {
     await fs.copy(path.join(wdir, deployConf.originalVersion), path.join(deployConf.source))
     console.log(msg.MSG_UNPATCHED)
 
-    return ch.lock(wdir)
+    await ch.lock(wdir)
     console.log(msg.MSG_CHANGES_UPDATED)
     return Promise.resolve(true)
   } catch(err) {
