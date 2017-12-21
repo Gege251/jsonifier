@@ -4,8 +4,10 @@ const path  = require('path')
 
 const msg	  = require('../lang/lang.js').getMessages()
 
-module.exports = async function(directory, fileSrc) {
-	const deployConfFile = path.join(directory, '../.deployconf')
+module.exports = addToChange
+  
+async function addToChange(wdir, fileSrc) {
+	const deployConfFile = path.join(wdir, '../.deployconf')
 
 	if (!fileSrc) {
 		console.log(msg.ERR_NO_FILE)
@@ -28,30 +30,34 @@ module.exports = async function(directory, fileSrc) {
 		return Promise.resolve(false)
 	}
 
-  await chman.ensure(directory)
+  await chman.ensure(wdir)
 
-	if (await chman.fileExists(directory, fileSrc)) {
+	if (await chman.fileExists(wdir, fileSrc)) {
 		console.log(msg.ERR_FILE_ALREADY_ADDED)
 		return Promise.resolve(false)
 	}
 
-	return fs.mkdirs(path.join(directory, deployConf.originalVersion, path.dirname(fileSrc)))
-		.then(fs.mkdirs(path.join(directory, deployConf.editedVersion, path.dirname(fileSrc))))
-		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.originalVersion, fileSrc)))
-		.then(fs.copy(path.join(deployConf.source, fileSrc), path.join(directory, deployConf.editedVersion, fileSrc)))
-		.then(_ => {
-			console.log(msg.MSG_FILE_ADDED)
+  try {
+	  const dirs = [
+      fs.mkdirs(path.join(wdir, deployConf.originalVersion, path.dirname(fileSrc))),
+		  fs.mkdirs(path.join(wdir, deployConf.editedVersion, path.dirname(fileSrc)))
+    ]
+    await Promise.all(dirs)
+    const copies = [
+		  fs.copy(path.join(deployConf.source, fileSrc), path.join(wdir, deployConf.originalVersion, fileSrc)),
+		  fs.copy(path.join(deployConf.source, fileSrc), path.join(wdir, deployConf.editedVersion, fileSrc))
+    ]
+    await Promise.all(copies)
+    console.log(msg.MSG_FILE_ADDED)
 
-      return chman.addFile(directory, fileSrc)
+    await chman.addFile(wdir, fileSrc)
+    console.log(msg.MSG_CHANGES_UPDATED)
 
-		})
-	 	.then(_ => {
-			console.log(msg.MSG_CHANGES_UPDATED)
-			return Promise.resolve(true)
-		})
-		.catch(err => {
-			console.log(msg.ERR_FILE_RW)
-			return Promise.resolve(false)
-		})
+    return Promise.resolve(true)
+
+  } catch(e) {
+    console.log(msg.ERR_FILE_RW)
+    return Promise.resolve(false)
+  }
 
 }

@@ -1,86 +1,90 @@
-const fs = require('fs-extra');
-const path = require('path');
-const readline = require('readline');
+const fs       = require('fs-extra')
+const path     = require('path')
+const readline = require('readline')
+const ch       = require('./utils/change-manager')
 
-const msg	= require('../lang/lang.js').getMessages();
+const msg      = require('../lang/lang.js').getMessages();
 
-module.exports = function(directory, fileDel) {
-	const changesFile = path.join(directory, 'changes.json');
-	const deployConfFile = path.join(directory, '../.deployconf');
+module.exports = removeFromChange
+
+async function removeFromChange(wdir, fileDel) {
+	const deployConfFile = path.join(wdir, '../.deployconf')
 
 	if (!fileDel) {
-		console.log(msg.ERR_NO_FILE);
-		return Promise.resolve(false);
+		console.log(msg.ERR_NO_FILE)
+		return Promise.resolve(false)
 	}
 
 	if (!fs.existsSync(deployConfFile)) {
 		console.log(msg.ERR_NO_PROJECT)
-		return Promise.resolve(false);
+		return Promise.resolve(false)
 	}
-	var deployConf = fs.readJsonSync(deployConfFile);
+	const deployConf = fs.readJsonSync(deployConfFile);
 
-	if (!fs.existsSync(changesFile)) {
-		console.log(msg.ERR_NO_CHANGESFILE);
-		return Promise.resolve(false);
+  await ch.ensure(wdir)
+
+	if (! await ch.exists(wdir)) {
+		console.log(msg.ERR_NO_CHANGESFILE)
+		return Promise.resolve(false)
 	}
-	var changesConf = fs.readJsonSync(changesFile);
-	var changes = changesConf.changes;
-	var changeIndex = changes.findIndex(file => { return path.join(file.path, file.filename) == path.join(fileDel) });
 
-	if (changeIndex === -1) {
-		console.log(msg.ERR_FILE_NOT_IN_CHANGE);
-		return Promise.resolve(false);
+	if (! await ch.fileExists(wdir, fileDel)) {
+		console.log(msg.ERR_FILE_NOT_IN_CHANGE)
+		return Promise.resolve(false)
 	}
 
 	// If the file has been edited since the add then ask for confirmation
-	if (changes[changeIndex].added !== changes[changeIndex].changed) {
+	if (await ch.fileEdited(wdir, fileDel)) {
 		const rl = readline.createInterface({
 			input: process.stdin,
 			output: process.stdout
 		});
 
-		return new Promise((resolve, reject) =>
+		return new Promise((resolve) =>
 			rl.question(msg.INQ_FILE_DEL + '\n', answer => {
-				rl.close();
-				if (answer == 'y' || answer == 'Y') {
-					resolve(removeFile());
+				rl.close()
+				if (answer === 'y' || answer === 'Y') {
+					resolve(removeFile())
 				}
 			})
 		)
 	} else {
-		return removeFile();
+		return removeFile()
 	}
 
 	function removeFile() {
-		return fs.remove(path.join(directory, deployConf.originalVersion, fileDel))
-			.then(fs.remove(path.join(directory, deployConf.editedVersion, fileDel)))
-			.then(_ => {
+		return fs.remove(path.join(wdir, deployConf.originalVersion, fileDel))
+			.then(fs.remove(path.join(wdir, deployConf.editedVersion, fileDel)))
+			.then(() => {
 				console.log(fileDel, msg.MSG_FILE_DELETED);
 
-				var pathRemains = path.join(directory, deployConf.originalVersion, path.dirname(fileDel));
-				while (pathRemains !== path.join(directory, deployConf.originalVersion) && fs.readdirSync(pathRemains).length == 0) {
-					fs.removeSync(pathRemains);
-					pathRemains = path.dirname(pathRemains);
-				}
+        rmdirsRecur(
+          path.join(wdir, deployConf.originalVersion), 
+          path.join(wdir, deployConf.originalVersion, path.dirname(fileDel))
+        )
 
-				pathRemains = path.join(directory, deployConf.editedVersion, path.dirname(fileDel));
-				while (pathRemains !== path.join(directory, deployConf.editedVersion) && fs.readdirSync(pathRemains).length == 0) {
-					fs.removeSync(pathRemains);
-					pathRemains = path.dirname(pathRemains);
-				}
+        rmdirsRecur(
+          path.join(wdir, deployConf.editedVersion), 
+          path.join(wdir, deployConf.editedVersion, path.dirname(fileDel))
+        )
 
-				changes.splice(changeIndex, 1);
-
-				return fs.writeJson(changesFile, changesConf, {spaces: 4} )
+        return ch.removeFile(wdir, fileDel)
 			})
-			.then(_ => {
+			.then(() => {
 				console.log(msg.MSG_CHANGES_UPDATED);
 				return Promise.resolve(true);
 			})
-			.catch(err => {
+			.catch(() => {
 				console.log(msg.ERR_FILE_RW)
 				return Promise.resolve(false);
 			});
 
 	}
+}
+
+function rmdirsRecur(basedir, current) {
+  if (current !== basedir && fs.readdirSync(current).length === 0) {
+    fs.removeSync(current)
+    rmdirsRecur(basedir, path.dirname(current))
+  }
 }

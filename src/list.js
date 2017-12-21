@@ -1,7 +1,7 @@
 const fs    = require('fs-extra')
 const path  = require('path')
 const chalk = require('chalk')
-const chman = require('./utils/change-manager')
+const ch    = require('./utils/change-manager')
 
 const msg	  = require('../lang/lang.js').getMessages();
 
@@ -13,42 +13,49 @@ const comparePath = function(f1, f2, fullPath) {
 	}
 }
 
-module.exports = function(directory, verbose, fullPath, report) {
+module.exports = list
 
-  chman.read(directory)
-    .then(changesConf => {
-			var files = changesConf.changes;
-			let output = [];
+async function list(wdir, verbose, fullPath, report) {
 
-			if (report) {
-				chalk.enabled = false;
-			}
+	if (! await ch.exists(wdir)) {
+		console.log(msg.ERR_NO_CHANGESFILE)
+		return Promise.resolve(false)
+	}
 
-			files
-				.sort((f1, f2) => comparePath(f1, f2, fullPath))
-			  .forEach(file => {
-					let filePath = fullPath ? path.join(file.path, file.filename) : file.filename;
-					if (verbose) {
-						output.push(chalk.green(filePath));
-						if (!fullPath) {
-							output.push('\t' + file.path);
-						}
-						output.push('\t' + file.added);
-						output.push('\t' + file.changed);
+ ch.read(wdir)
+  .then(changesConf => {
+    const files = changesConf.changes
+    let output  = []
 
-					} else {
-						output.push(chalk.green(filePath));
-					}
-				})
+    if (report) {
+      chalk.enabled = false
+    }
 
-			if (report) {
-				fs.writeFile(path.join(directory, 'report.txt'), output.join('\r\n'))
-					.then(console.log(msg.MSG_REPORT_CREATED))
-					.catch(err => console.log(msg.ERR_FILE_RW))
+    files
+      .sort((f1, f2) => comparePath(f1, f2, fullPath))
+      .forEach(file => {
+        let filePath = fullPath ? path.join(file.path, file.filename) : file.filename
+        if (verbose) {
+          output.push(chalk.green(filePath))
+          if (!fullPath) {
+            output.push('\t' + file.path)
+          }
+          output.push('\t' + file.added)
+          output.push('\t' + file.changed)
 
-			} else {
-					console.log(output.join('\r\n'));
-			}
+        } else {
+          output.push(chalk.green(filePath))
+        }
+      })
+
+    if (report) {
+      fs.writeFile(path.join(wdir, 'report.txt'), output.join('\r\n'))
+        .then(console.log(msg.MSG_REPORT_CREATED))
+        .catch(() => console.log(msg.ERR_FILE_RW))
+
+    } else {
+        console.log(output.join('\r\n'))
+    }
 	})
-	.catch(err => console.log(msg.ERR_NO_CHANGESFILE));
+	.catch((e) => console.log(e))
 }
