@@ -1,15 +1,15 @@
 const fs       = require('fs-extra')
-const ch       = require('./utils/change-manager')
-const dp       = require('./utils/deployconf-manager')
 const path     = require('path')
 const chokidar = require('chokidar')
-const logger   = new (require('./logger'))()
+const dp       = require('./utils/deployconf-manager')
+const ch       = require('./utils/change-manager')
+const msg      = require('./lang/lang.js').getMessages()
+const logger   = new (require('./utils/logger'))()
+const log      = logger.log
 
 module.exports = watcher
 
 async function watcher(wdir) {
-  const msg = require('../lang/lang.js').getMessages()
-  const log = logger.log
   let watchers
 
 	if (! dp.exists(wdir)) {

@@ -1,15 +1,15 @@
-const parseArgs	= require('minimist');
-const fs				= require('fs-extra');
-const path			= require('path');
+const parseArgs	= require('minimist')
+const fs				= require('fs-extra')
+const path			= require('path')
 
-const argv			= parseArgs(process.argv.slice(2));
-const config    = fs.readJsonSync(path.join(__dirname, 'config.json'));
+const argv			= parseArgs(process.argv.slice(2))
+const config    = fs.readJsonSync(path.join(__dirname, 'config.json'))
 
-const lang			= require('./lang/lang.js');
-lang.setLang(argv.lang || fs.readJsonSync(path.join(__dirname, './config.json')).lang);
+const lang			= require('./src/lang/lang.js')
+lang.setLang(argv.lang || fs.readJsonSync(path.join(__dirname, './config.json')).lang)
 
-const msg 			= lang.getMessages();
-const directory	= path.resolve(argv.d || process.cwd());
+const msg 			= lang.getMessages()
+const directory	= path.resolve(argv.d || process.cwd())
 
 const modules = [
 	{
@@ -111,47 +111,47 @@ const modules = [
 ]
 
 function loadModule(moduleName) {
-	const module = modules.find(module => module.keys.includes(moduleName));
+	const module = modules.find(module => module.keys.includes(moduleName))
 	if (module) {
-		(require(module.path))(...module.args);
+		(require(module.path))(...module.args)
 	}
 
 	else if (!moduleName && !argv.v) {
-		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'))
 
-		console.log(`${npmConf.name} v${npmConf.version}`);
-		console.log(msg.MSG_WELCOME);
-		return;
+		console.log(`${npmConf.name} v${npmConf.version}`)
+		console.log(msg.MSG_WELCOME)
+		return
 	}
 
 	else if (moduleName === 'help') {
 		// Listing all command options
-		console.log(msg.MSG_HELP +'\n');
+		console.log(msg.MSG_HELP +'\n')
 
-		modules.forEach(module => module.keys = module.keys.join(', '));
+		modules.forEach(module => module.keys = module.keys.join(', '))
 		var longest = modules
 			.map(module => module.keys.length)
-			.reduce((m1, m2) => Math.max(m1, m2));
+			.reduce((m1, m2) => Math.max(m1, m2))
 
 		modules.forEach(module => {
-			let spaces = ' '.repeat(longest - module.keys.length + 2);
-			console.log('\t' + module.keys + spaces + module.description[lang.getLang()]);
+			let spaces = ' '.repeat(longest - module.keys.length + 2)
+			console.log('\t' + module.keys + spaces + module.description[lang.getLang()])
 		})
-		return;
+		return
 	}
 
 	else if (moduleName === 'version' || argv.v) {
-		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
-		console.log(`${npmConf.version}`);
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'))
+		console.log(`${npmConf.version}`)
 	}
 
 	else {
-		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'))
 
-		console.log(`${npmConf.name} v${npmConf.version}`);
-		console.log(msg.ERR_NO_SUCH_COMMAND);
-		return;
+		console.log(`${npmConf.name} v${npmConf.version}`)
+		console.log(msg.ERR_NO_SUCH_COMMAND)
+		return
 	}
 }
 
-loadModule(argv._[0]);
+loadModule(argv._[0])

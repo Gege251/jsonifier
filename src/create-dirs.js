@@ -1,8 +1,7 @@
 const fs   = require('fs-extra')
-const dp   = require('./utils/deployconf-manager')
 const path = require('path')
-
-const msg  = require('../lang/lang.js').getMessages()
+const dp   = require('./utils/deployconf-manager')
+const msg  = require('./lang/lang.js').getMessages()
 
 module.exports = createDirs
 

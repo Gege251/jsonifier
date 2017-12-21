@@ -1,13 +1,12 @@
 const fs       = require('fs-extra')
-const dp       = require('./utils/deployconf-manager')
 const path     = require('path')
 const archiver = require('archiver')
-
-const msg      = require('../lang/lang.js').getMessages()
+const dp       = require('./utils/deployconf-manager')
+const msg      = require('./lang/lang.js').getMessages()
 
 module.exports = archive
 
-async function archive(directory) {
+async function archive(wdir) {
 
 	if (! dp.exists(wdir)) {
 		console.log(msg.ERR_NO_PROJECT)
@@ -15,23 +14,23 @@ async function archive(directory) {
 	}
 	const dpConf = await dp.read(wdir)
   
-	if (!fs.existsSync(path.join(directory))) {
+	if (!fs.existsSync(path.join(wdir))) {
 		console.log(msg.ERR_NO_CHANGESFOLDER)
-		return;
+		return
 	}
 
 	console.log(msg.MSG_ARCHIVE_START)
 
 	const date = new Date()
-	const fileStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '_' + path.basename(directory)
-	let archivePath = path.join(directory, '../', dpConf.archive, fileStr)
+	const fileStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '_' + path.basename(wdir)
+	let archivePath = path.join(wdir, '../', dpConf.archive, fileStr)
 
-	fs.mkdirs(path.join(directory, '../', dpConf.archive, path.basename(directory)))
+	fs.mkdirs(path.join(wdir, '../', dpConf.archive, path.basename(wdir)))
 		.then(_ => {
 			let counter = 0
 			while (fs.existsSync(archivePath + '.zip')) {
 				counter++
-				archivePath = path.join(directory, '../', dpConf.archive, fileStr + '_' + counter)
+				archivePath = path.join(wdir, '../', dpConf.archive, fileStr + '_' + counter)
 			}
 			archivePath += '.zip'
 
@@ -44,7 +43,7 @@ async function archive(directory) {
 				console.log(msg.MSG_ARCHIVE_COMPLETED,　archivePath)
 			})
 			archive.pipe(archiveFile)
-			archive.directory(directory, false)
+			archive.directory(wdir, false)
 			archive.finalize()
 		})
 

@@ -2,20 +2,12 @@ const fs   = require('fs-extra')
 const path = require('path')
 
 module.exports = {
-  ensure,
   exists,
   read,
   readSync,
   findDeployconfFile,
   findProjectDir,
   dpFileName
-}
-
-// If no deployconf file is found create a new one in the current directory
-function ensure(dpDir) {
-  if (! exists(dpDir)) {
-    create(dpDir)
-  } 
 }
 
 // Checks if deployconf file exists in the directory or in any of its parents
@@ -41,6 +33,8 @@ function findDeployconfFile(directory) {
   return projectDir ? getDeployconfFile(projectDir) : ''
 }
 
+// Search for a valid project directory (which has a deployconf file)
+// recursively until it reaches the root
 function findProjectDir(directory) {
   if (directory === '/' || directory === '') {
     return ''
@@ -51,6 +45,7 @@ function findProjectDir(directory) {
   }
 }
 
+// Returns the filename of the deployconf file
 function dpFileName() {
   return fs.readJsonSync(path.join(__dirname, '../../config.json')).deployconfFile.filename
 }

@@ -115,6 +115,7 @@ async function fileExists(chDir, fileSrc) {
 	return changes.some(file => path.join(file.path, file.filename) === path.join(fileSrc) )
 }
 
+// Checks is the file has been edited
 async function fileEdited(chDir, fileSrc) {
   const changes = (await read(chDir)).changes
   const change  = changes.find(file => path.join(file.path, file.filename) === path.join(fileSrc));
@@ -146,6 +147,7 @@ function changeTitle(chDir, newTitle) {
   update(chDir, change)
 }
 
+// Returns the name of the changes file (ex.: changes.json)
 function chFileName(chDir) {
   try {
     return dp.readSync(chDir).changesFile.filename
@@ -188,6 +190,7 @@ function findChangesFile(chDir) {
   }
 }
 
+// Returns the file type of the change file (ex.: json, yaml)
 function chFileType(chDir) {
   try {
     return dp.readSync(chDir).changesFile.filetype

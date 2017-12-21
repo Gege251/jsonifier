@@ -1,10 +1,9 @@
 const fs       = require('fs-extra')
 const path     = require('path')
 const readline = require('readline')
-const ch       = require('./utils/change-manager')
 const dp       = require('./utils/deployconf-manager')
-
-const msg      = require('../lang/lang.js').getMessages()
+const ch       = require('./utils/change-manager')
+const msg      = require('./lang/lang.js').getMessages()
 
 module.exports = removeFromChange
 
@@ -38,7 +37,7 @@ async function removeFromChange(wdir, fileDel) {
 		const rl = readline.createInterface({
 			input: process.stdin,
 			output: process.stdout
-		});
+		})
 
 		return new Promise((resolve) =>
 			rl.question(msg.INQ_FILE_DEL + '\n', answer => {
@@ -60,7 +59,7 @@ async function removeFromChange(wdir, fileDel) {
       ]
 
       await Promise.all(dirs)
-      console.log(fileDel, msg.MSG_FILE_DELETED);
+      console.log(fileDel, msg.MSG_FILE_DELETED)
 
       rmdirsRecur(
         path.join(wdir, dpConf.originalVersion), 
@@ -73,11 +72,11 @@ async function removeFromChange(wdir, fileDel) {
       )
 
       ch.removeFile(wdir, fileDel)
-      console.log(msg.MSG_CHANGES_UPDATED);
-      return Promise.resolve(true);
+      console.log(msg.MSG_CHANGES_UPDATED)
+      return Promise.resolve(true)
     } catch(e) {
       console.log(msg.ERR_FILE_RW)
-      return Promise.resolve(false);
+      return Promise.resolve(false)
     }
 
 	}

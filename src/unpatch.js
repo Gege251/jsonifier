@@ -1,9 +1,8 @@
 const fs   = require('fs-extra')
 const path = require('path')
-const ch   = require('./utils/change-manager')
 const dp   = require('./utils/deployconf-manager')
-
-const msg  = require('../lang/lang.js').getMessages()
+const ch   = require('./utils/change-manager')
+const msg  = require('./lang/lang.js').getMessages()
 
 module.exports = unpatch
   

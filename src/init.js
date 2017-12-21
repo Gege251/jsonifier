@@ -1,14 +1,12 @@
 const fs        = require('fs-extra')
-const dp        = require('./utils/deployconf-manager')
 const path      = require('path')
-const chalk     = require('chalk')
 const inquirer  = require('inquirer')
-
-const msg     	= require('../lang/lang.js').getMessages()
+const dp        = require('./utils/deployconf-manager')
+const msg     	= require('./lang/lang.js').getMessages()
 
 module.exports = init
   
-function init(directory) {
+async function init(directory) {
   console.log(msg.MSG_INIT_WELCOME)
   console.log(directory + '\n')
   console.log(msg.MSG_EXIT_HELP + '\n')
@@ -98,14 +96,17 @@ function init(directory) {
 
   ]
 
-  inquirer.prompt(questions).then(answers => {
+  inquirer.prompt(questions).then(async answers => {
     answers.otherDirs = answers.otherDirs.split(';').map(v => v.trim())
     const projectPath = path.join(directory, answers.name)
 
-    fs.mkdirs(projectPath)
-      .then(fs.writeJson(path.join(projectPath, dp.dpFileName()), answers, {spaces: 4}))
-      .then(_ => console.log(msg.MSG_INIT_COMPLETE))
-      .catch(err => console.log(msg.ERR_FILE_RW))
+    try {
+      await fs.mkdirs(projectPath)
+      await fs.writeJson(path.join(projectPath, dp.dpFileName()), answers, {spaces: 4})
+      console.log(msg.MSG_INIT_COMPLETE)
+    } catch(e) {
+      console.log(msg.ERR_FILE_RW)
+    }
   })
 
 }

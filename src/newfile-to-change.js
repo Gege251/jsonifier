@@ -1,9 +1,8 @@
 const fs   = require('fs-extra')
-const ch   = require('./utils/change-manager')
-const dp   = require('./utils/deployconf-manager')
 const path = require('path')
-
-const msg  = require('../lang/lang.js').getMessages()
+const dp   = require('./utils/deployconf-manager')
+const ch   = require('./utils/change-manager')
+const msg  = require('./lang/lang.js').getMessages()
 
 module.exports = newFileToChange
 
@@ -53,6 +52,6 @@ async function newFileToChange (wdir, fileSrc) {
   } catch(e) {
     console.log(msg.ERR_FILE_RW)
     return Promise.resolve(false)
-  };
+  }
 
 }
