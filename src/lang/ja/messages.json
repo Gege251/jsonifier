@@ -39,7 +39,7 @@
 	"ERR_CHANGE_ALREADY_EXISTS": "課題フォルダーが既に存在しています。",
 	"ERR_INVALID_NAME": "ネームが無効です。",
 	"ERR_NO_CHANGE_NAME": "課題名を入力してください。",
-	"ERR_NO_CHANGESFILE": "Changes.json　ファイルが見つかりません。",
+	"ERR_NO_CHANGESFILE": "Changes ファイルが見つかりません。",
 	"ERR_NO_CHANGESFOLDER": "Changes フォルダーが見つかれいません。",
 	"ERR_FILE_NOT_IN_CHANGE": "このファイルは登録されていません。",
 	"ERR_CHANGE_EMPTY": "課題フォルダーは空です。",

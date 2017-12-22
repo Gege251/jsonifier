@@ -1,5 +1,5 @@
 {
-	"lang": "ja",
+  "lang": "ja",
   "deployconfFile": {
     "filename": ".deployconf",
     "filetype": "json"

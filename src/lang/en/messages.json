@@ -39,7 +39,7 @@
 	"ERR_CHANGE_ALREADY_EXISTS": "Change folder already exists",
 	"ERR_INVALID_NAME": "Invalid name.",
 	"ERR_NO_CHANGE_NAME": "Please enter a name for the change.",
-	"ERR_NO_CHANGESFILE": "Changes.json file not found.",
+	"ERR_NO_CHANGESFILE": "Changes file not found.",
 	"ERR_NO_CHANGESFOLDER": "Changes folder not found.",
 	"ERR_FILE_NOT_IN_CHANGE": "File is not registered in the change.",
 	"ERR_CHANGE_EMPTY": "The change is empty.",
