@@ -18,16 +18,19 @@ function exists(dpDir) {
 // Read the contents of the deployconf file
 function read(dpDir) {
   const deployconfFile = findDeployconfFile(dpDir)
-  if (deployconfFile) {
-    return fs.open(deployconfFile, 'r') .then(chFile => fs.readJson(chFile))
-  } else {
-    return null
-  }
+  if (! deployconfFile) {
+    return Promise.reject(new Error('No deployconf file!'))
+  } 
+  return fs.open(deployconfFile, 'r') .then(chFile => fs.readJson(chFile))
 }
 
 // Read the contents of the deployconf file
 function readSync(dpDir) {
-	return fs.readJsonSync(findDeployconfFile(dpDir))
+  const deployconfFile = findDeployconfFile(dpDir)
+  if (! deployconfFile) {
+    throw new Error('No deployconf file!')
+  } 
+  return fs.readJsonSync(findDeployconfFile(dpDir))
 }
 
 // Find the deployconf file in current directory, or any of its parents

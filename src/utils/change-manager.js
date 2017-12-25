@@ -50,8 +50,7 @@ function exists(chDir) {
 async function read(chDir) {
   const chFile    = findChangesFile(chDir)
   if (!chFile) {
-    return null
-    // throw new Error('No changes file')
+    return Promise.reject(new Error('No changes file!'))
   }
   const chContent = await fs.readFile(chFile)
   const fileType  = chFileType(chDir)

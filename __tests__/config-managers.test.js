@@ -28,38 +28,39 @@ beforeAll(() => {
   })
 
   const mockFileSystem = {
-    '/testpack/deeply/nested'   : '',
-    '/testpack2/'               : '',
-    '/testdeploy/deeply/nested' : '',
-    '/dummy/'                   : '',
-    [mockConfigPath]            : mockConfig,
-    '/testdeploy/.deployconf'   : mockDeployConf
+    '/test/testpack/deeply/nested' : '',
+    '/test/testpack2/'             : '',
+    '/dummy/'                      : '',
+    [mockConfigPath]               : mockConfig,
+    '/test/.deployconf'            : mockDeployConf
   }
 
   fs.vol.fromJSON(mockFileSystem)
 })
 
-
+//
 // TESTS
+//
 
-describe('Changes manager', () => {
+describe('Config managers', () => {
   const ch = require('../src/utils/change-manager')
+  const dp = require('../src/utils/deployconf-manager')
 
   test('Create a new changes file', async () => {
     expect.assertions(1)
 
-    await ch.create('/testpack', 'noname')
-    expect(fs.existsSync('/testpack/changes.json')).toBeTruthy()
+    await ch.create('/test/testpack', 'noname')
+    expect(fs.existsSync('/test/testpack/changes.json')).toBeTruthy()
   })
 
-  test('Ensuring changes file (without deleting existsing an one)', async () => {
+  test('Ensuring changes file', async () => {
     expect.assertions(2)
 
-    await ch.ensure('/testpack')
-    await ch.ensure('/testpack2')
+    await ch.ensure('/test/testpack')
+    await ch.ensure('/test/testpack2')
 
-    expect(fs.readJsonSync('/testpack/changes.json').name).toBe('noname')
-    expect(fs.readJsonSync('/testpack2/changes.json').name).toBe('testpack2')
+    expect(fs.readJsonSync('/test/testpack/changes.json').name).toBe('noname')
+    expect(fs.readJsonSync('/test/testpack2/changes.json').name).toBe('testpack2')
   })
 
   test('Reading changes file', async () => {
@@ -71,11 +72,10 @@ describe('Changes manager', () => {
       changes: [],
       lock: false
     }
-    expect(await ch.read('/testpack')).toEqual(expectedFile)
-    expect(await ch.read('/testpack/deeply/nested')).toEqual(expectedFile)
+    expect(await ch.read('/test/testpack')).toEqual(expectedFile)
+    expect(await ch.read('/test/testpack/deeply/nested')).toEqual(expectedFile)
 
-    expect(await ch.read('/dummy')).toBeNull()
-    // expect(await ch.read('/dummy')).toThrowError('No change file')
+    expect(ch.read('/dummy')).rejects.toThrow('No changes file!')
   })
 
   test('Adding a file to changes list', async () => {
@@ -84,9 +84,9 @@ describe('Changes manager', () => {
     const mockDate = new Date(Date.UTC(2017,0,1)).valueOf()
     Date.now = jest.fn(() => mockDate)
 
-    await ch.addFile('/testpack', '/testfile1')
-    await ch.addFile('/testpack', '/testfolder/testfile2')
-    const chFile = await ch.read('/testpack')
+    await ch.addFile('/test/testpack', '/testfile1')
+    await ch.addFile('/test/testpack', '/testfolder/testfile2')
+    const chFile = fs.readJsonSync('/test/testpack/changes.json')
 
     expect(chFile.changes.length).toBe(2)
 
@@ -104,8 +104,8 @@ describe('Changes manager', () => {
   test('Removing a file from changes list', async () => {
     expect.assertions(1)
 
-    await ch.removeFile('/testpack', '/testfolder/testfile2')
-    const chFile = await ch.read('/testpack')
+    await ch.removeFile('/test/testpack', '/testfolder/testfile2')
+    const chFile = fs.readJsonSync('/test/testpack/changes.json')
 
     expect(chFile.changes.length).toBe(1)
   })
@@ -116,8 +116,8 @@ describe('Changes manager', () => {
     const mockDate = new Date(Date.UTC(2017,0,2)).valueOf()
     Date.now = jest.fn(() => mockDate)
 
-    await ch.updateFile('/testpack', '/testfile1')
-    const chFile = await ch.read('/testpack')
+    await ch.updateFile('/test/testpack', '/testfile1')
+    const chFile = fs.readJsonSync('/test/testpack/changes.json')
     expect(chFile.changes[0].changed).toBe(new Date(mockDate).toLocaleString())
 
   })
@@ -125,21 +125,17 @@ describe('Changes manager', () => {
   test('Checking if file exists', async () => {
     expect.assertions(2)
 
-    expect(await ch.fileExists('/testpack', '/testfile1')).toBeTruthy()
-    expect(await ch.fileExists('/testpack', '/testfile2')).toBeFalsy()
+    expect(await ch.fileExists('/test/testpack', '/testfile1')).toBeTruthy()
+    expect(await ch.fileExists('/test/testpack', '/testfile2')).toBeFalsy()
   })
 
   test('Checking if file has been edited', async () => {
     expect.assertions(2)
 
-    await ch.addFile('/testpack', '/testfile2')
-    expect(await ch.fileEdited('/testpack', '/testfile1')).toBeTruthy()
-    expect(await ch.fileEdited('/testpack', '/testfile2')).toBeFalsy()
+    await ch.addFile('/test/testpack', '/testfile2')
+    expect(await ch.fileEdited('/test/testpack', '/testfile1')).toBeTruthy()
+    expect(await ch.fileEdited('/test/testpack', '/testfile2')).toBeFalsy()
   })
-})
-
-describe('DeployConf manager', () => {
-  const dp = require('../src/utils/deployconf-manager')
 
   test('Reading deployconf file', async () => {
     expect.assertions(3)
@@ -152,8 +148,8 @@ describe('DeployConf manager', () => {
       archive   : 'archive',
       otherDirs : []
     }
-    expect(await dp.read('/testdeploy')).toEqual(expectedFile)
-    expect(await dp.read('/testdeploy/deeply/nested')).toEqual(expectedFile)
-    expect(await dp.read('/dummy')).toBeNull()
+    expect(await dp.read('/test')).toEqual(expectedFile)
+    expect(await dp.read('/test/testpack/deeply/nested')).toEqual(expectedFile)
+    expect(dp.read('/dummy')).rejects.toThrow('No deployconf file')
   })
 })
