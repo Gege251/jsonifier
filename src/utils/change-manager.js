@@ -17,7 +17,8 @@ module.exports = {
   unlock,
   rename,
   changeTitle,
-  chFileName
+  chFileName,
+  getChangesFile
 }
 
 // Create a new change file
