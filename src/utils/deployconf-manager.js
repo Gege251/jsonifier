@@ -17,8 +17,12 @@ function exists(dpDir) {
 
 // Read the contents of the deployconf file
 function read(dpDir) {
-	return fs.open(findDeployconfFile(dpDir), 'r')
-    .then(chFile => fs.readJson(chFile))
+  const deployconfFile = findDeployconfFile(dpDir)
+  if (deployconfFile) {
+    return fs.open(deployconfFile, 'r') .then(chFile => fs.readJson(chFile))
+  } else {
+    return null
+  }
 }
 
 // Read the contents of the deployconf file

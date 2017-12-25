@@ -17,8 +17,7 @@ module.exports = {
   unlock,
   rename,
   changeTitle,
-  chFileName,
-  getChangesFile
+  chFileName
 }
 
 // Create a new change file
@@ -38,7 +37,7 @@ function create(chDir, name, title = '') {
 // If no change file is found create a new one in the current directory
 function ensure(chDir) {
   if (! exists(chDir)) {
-    create(path.basename(chDir))
+    return create(chDir, path.basename(chDir))
   } 
 }
 
@@ -49,7 +48,12 @@ function exists(chDir) {
 
 // Read the contents of the change file
 async function read(chDir) {
-  const chContent = await fs.readFile(findChangesFile(chDir))
+  const chFile    = findChangesFile(chDir)
+  if (!chFile) {
+    return null
+    // throw new Error('No changes file')
+  }
+  const chContent = await fs.readFile(chFile)
   const fileType  = chFileType(chDir)
   const unpack    = {
     'json': content => JSON.parse(content),
@@ -61,7 +65,7 @@ async function read(chDir) {
 
 // Add a new file to the changes list
 function addFile(chDir, fileSrc) {
-  const currentTime = new Date().toLocaleString()
+  const currentTime = new Date(Date.now()).toLocaleString()
   const newF = {
     filename : path.basename(fileSrc),
     path     : path.dirname(fileSrc),
@@ -69,7 +73,7 @@ function addFile(chDir, fileSrc) {
     changed  : currentTime
   }
   const change = ch => { return {...ch, changes: [...ch.changes, newF] } }
-  update(chDir, change)
+  return update(chDir, change)
 }
 
 // Remove a file from the changes list
@@ -87,14 +91,14 @@ function removeFile(chDir, fileDel) {
       return { ...ch }
     }
   }
-  update(chDir, change)
+  return update(chDir, change)
 }
 
 // Update the change date of a file in the changes list
 function updateFile(chDir, fileSrc) {
-  const currentTime = new Date().toLocaleString()
+  const currentTime = new Date(Date.now()).toLocaleString()
   const change      = ch => {
-  const chIdx       = ch.changes.findIndex(file => path.join(file.path, file.filename) === path.join(fileSrc));
+    const chIdx = ch.changes.findIndex(file => path.join(file.path, file.filename) === path.join(fileSrc));
     if (chIdx !== -1) {
       return { ...ch,
         changes: [
@@ -107,7 +111,7 @@ function updateFile(chDir, fileSrc) {
       return { ...ch }
     }
   }
-  update(chDir, change)
+  return update(chDir, change)
 }
 
 // Checks if the file exists in the change list
@@ -127,25 +131,25 @@ async function fileEdited(chDir, fileSrc) {
 // Set the lock in the change
 function lock(chDir) {
   const change = ch => { return {...ch, lock: true } }
-  update(chDir, change)
+  return update(chDir, change)
 }
 
 // Unset the lock in the change
 function unlock(chDir) {
   const change = ch => { return {...ch, lock: false } }
-  update(chDir, change)
+  return update(chDir, change)
 }
 
 // Rename the change
 function rename(chDir, newName) {
   const change = ch => { return {...ch, name: newName } }
-  update(chDir, change)
+  return update(chDir, change)
 }
 
 // Change the title of the change
 function changeTitle(chDir, newTitle) {
   const change = ch => { return {...ch, name: newTitle } }
-  update(chDir, change)
+  return update(chDir, change)
 }
 
 // Returns the name of the changes file (ex.: changes.json)
