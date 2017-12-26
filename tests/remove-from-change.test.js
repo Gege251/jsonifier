@@ -9,85 +9,18 @@ jest.mock('../src/utils/areyousure', () => {
 const path       = require('path')
 const fs         = require('fs-extra')
 const areyousure = require('../src/utils/areyousure')
+const setup      = require('./setup')
 
 // Setup
 
 beforeEach(() => {
-  const mockConfigPath = path.join(__dirname, '../config.json')
-  
-  const mockConfig     = JSON.stringify({
-    changesFile: {
-      filename: 'changes.json',
-      filetype: 'json'
-    },
-    deployconfFile: {
-      filename: '.deployconf',
-      filetype: 'json'
-    }
-  })
-
-  const mockDeployConf = JSON.stringify({
-    name            : 'Testdeploy',
-    source          : '/source',
-    originalVersion : '/original',
-    editedVersion   : '/edited',
-    archive         : 'archive',
-    otherDirs       : []
-  })
-
-  const currentDate = new Date(Date.UTC(2017,0,1)).toLocaleString()
-  const newDate     = new Date(Date.UTC(2017,0,2)).toLocaleString()
-
-  const mockChFile     = JSON.stringify({
-    name    : 'noname',
-    title   : '',
-    changes : [
-        {
-          filename : 'testfile1',
-          path     : '/',
-          added    : currentDate,
-          changed  : currentDate
-        },
-        {
-          filename : 'testfile2',
-          path     : '/folder1',
-          added    : currentDate,
-          changed  : newDate
-        },
-        {
-          filename : 'testfile3',
-          path     : '/folder1/folder2/folder3',
-          added    : currentDate,
-          changed  : currentDate
-        }
-    ],
-    lock    : false
-  })
-
-  const mockFileSystem = {
-    '/source/testfile1'                                         : 'This is file 1',
-    '/source/folder1/testfile2'                                 : 'This is file 2',
-    '/source/folder1/folder2/folder3/testfile3'                 : 'This is file 3',
-    [mockConfigPath]                                            : mockConfig,
-    '/test/.deployconf'                                         : mockDeployConf,
-    '/test/testpack/changes.json'                               : mockChFile,
-    '/test/testpack/original/testfile1'                         : 'This is file 1',
-    '/test/testpack/original/folder1/testfile2'                 : 'This is file 2',
-    '/test/testpack/original/folder1/folder2/folder3/testfile3' : 'This is file 3',
-    '/test/testpack/edited/testfile1'                           : 'This is file 1',
-    '/test/testpack/edited/folder1/testfile2'                   : 'This is file 2 edited',
-    '/test/testpack/edited/folder1/folder2/folder3/testfile3'   : 'This is file 3',
-  }
-
-  fs.vol.fromJSON(mockFileSystem)
-
-  console.log = jest.fn()
+  setup.init()
 })
 
 // Teardown
 
 afterEach(() => {
-  fs.vol.reset()
+  setup.teardown()
 })
 
 // Tests
