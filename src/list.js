@@ -2,7 +2,7 @@ const fs    = require('fs-extra')
 const path  = require('path')
 const chalk = require('chalk')
 const ch    = require('./utils/change-manager')
-const msg	  = require('./lang/lang.js').getMessages()
+const msg   = require('./lang/lang.js').messages
 
 const comparePath = function(f1, f2, fullPath) {
 	if (fullPath) {

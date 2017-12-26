@@ -3,7 +3,7 @@ const path     = require('path')
 const chokidar = require('chokidar')
 const dp       = require('./utils/deployconf-manager')
 const ch       = require('./utils/change-manager')
-const msg      = require('./lang/lang.js').getMessages()
+const msg      = require('./lang/lang.js').messages
 const logger   = new (require('./utils/logger'))()
 const log      = logger.log
 

@@ -1,10 +1,10 @@
-const fs    = require('fs-extra')
-const dp    = require('./utils/deployconf-manager')
-const ch    = require('./utils/change-manager')
-const path  = require('path')
-const chalk = require('chalk')
+const fs               = require('fs-extra')
+const dp               = require('./utils/deployconf-manager')
+const ch               = require('./utils/change-manager')
+const path             = require('path')
+const chalk            = require('chalk')
 const { List, fromJS } = require('immutable')
-const msg	= require('./lang/lang.js').getMessages()
+const msg              = require('./lang/lang.js').messages
 
 module.exports = stats
 

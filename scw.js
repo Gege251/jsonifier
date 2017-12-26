@@ -8,7 +8,7 @@ const config    = fs.readJsonSync(path.join(__dirname, 'config.json'))
 const lang			= require('./src/lang/lang.js')
 lang.setLang(argv.lang || fs.readJsonSync(path.join(__dirname, './config.json')).lang)
 
-const msg 			= lang.getMessages()
+const msg 			= lang.messages
 const directory	= path.resolve(argv.d || process.cwd())
 
 const modules = [

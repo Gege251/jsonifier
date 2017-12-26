@@ -2,7 +2,7 @@ const fs       = require('fs-extra')
 const path     = require('path')
 const archiver = require('archiver')
 const dp       = require('./utils/deployconf-manager')
-const msg      = require('./lang/lang.js').getMessages()
+const msg	     = require('./lang/lang.js').messages
 
 module.exports = archive
 

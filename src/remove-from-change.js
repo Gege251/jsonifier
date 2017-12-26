@@ -1,9 +1,9 @@
-const fs       = require('fs-extra')
-const path     = require('path')
-const readline = require('readline')
-const dp       = require('./utils/deployconf-manager')
-const ch       = require('./utils/change-manager')
-const msg      = require('./lang/lang.js').getMessages()
+const fs         = require('fs-extra')
+const path       = require('path')
+const dp         = require('./utils/deployconf-manager')
+const ch         = require('./utils/change-manager')
+const areyousure = require('./utils/areyousure')
+const msg        = require('./lang/lang.js').messages
 
 module.exports = removeFromChange
 
@@ -32,21 +32,9 @@ async function removeFromChange(wdir, fileDel) {
 		return Promise.resolve(false)
 	}
 
-	// If the file has been edited since the add then ask for confirmation
+	// If the file has been edited confirm
 	if (await ch.fileEdited(wdir, fileDel)) {
-		const rl = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout
-		})
-
-		return new Promise((resolve) =>
-			rl.question(msg.INQ_FILE_DEL + '\n', answer => {
-				rl.close()
-				if (answer === 'y' || answer === 'Y') {
-					resolve(removeFile())
-				}
-			})
-		)
+    return areyousure(msg.INQ_FILE_DEL, removeFile) 
 	} else {
 		return removeFile()
 	}
@@ -71,7 +59,7 @@ async function removeFromChange(wdir, fileDel) {
         path.join(wdir, dpConf.editedVersion, path.dirname(fileDel))
       )
 
-      ch.removeFile(wdir, fileDel)
+      await ch.removeFile(wdir, fileDel)
       console.log(msg.MSG_CHANGES_UPDATED)
       return Promise.resolve(true)
     } catch(e) {
@@ -88,3 +76,4 @@ function rmdirsRecur(basedir, current) {
     rmdirsRecur(basedir, path.dirname(current))
   }
 }
+

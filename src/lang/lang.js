@@ -1,23 +1,20 @@
-const fs   = require('fs-extra')
-const path = require('path')
 
-function Lang() {
-	this.lang
-	this.messages
-}
+class Lang {
 
-Lang.prototype.setLang = function (arg) {
-		this.lang = arg && fs.existsSync(path.join(__dirname, '../lang', arg, 'messages.json'))
-				? arg : 'en'
-		this.messages = fs.readJsonSync(path.join(__dirname, '../lang', this.lang, 'messages.json'))
-}
+  constructor(arg) {
+    this.lang     = 'en'
+    this.messages = require('./en/messages')
+  }
 
-Lang.prototype.getMessages = function() {
-	return this.messages
-}
+  setLang(arg) {
+    const validLangs = [ 'en', 'ja' ]
 
-Lang.prototype.getLang = function() {
-	return this.lang
+    if (arg && validLangs.includes(arg)) {
+      this.lang     = arg
+      this.messages = require('./' + arg + '/messages')
+    }
+  }
+
 }
 
 module.exports = new Lang()

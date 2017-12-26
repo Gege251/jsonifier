@@ -1,4 +1,4 @@
-{
+module.exports = {
 	"MSG_WELCOME": "Source Code Watcherはシンプルなソースコード管理ツールです。\nコマンド一覧を表示するには　'scw help'　を入力してください。",
 	"MSG_HELP": "scw コマンド:",
 	"MSG_FILE_ADDED": "ファイル追加されました。",
