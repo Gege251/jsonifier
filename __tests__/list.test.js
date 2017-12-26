@@ -8,7 +8,6 @@ jest.mock('../src/utils/areyousure', () => {
 
 const path       = require('path')
 const fs         = require('fs-extra')
-const areyousure = require('../src/utils/areyousure')
 
 // Setup
 
@@ -92,67 +91,53 @@ afterEach(() => {
 
 // Tests
 
-describe('Remove file', () => {
-  const removeFromChange = require('../src/remove-from-change')
+describe('List changes', () => {
+  const list = require('../src/list')
 
 
-  test('Remove files from changes folder', async () => {
+  test('List changes', async () => {
 
-    await removeFromChange('/test/testpack', '/testfile1')
-
-    const chResult = fs.readJsonSync('/test/testpack/changes.json')
-
-    expect.assertions(3)
-    expect(chResult.changes.length).toBe(2)
-    expect(fs.existsSync('/test/testpack/original/testfile1')).toBeFalsy()
-    expect(fs.existsSync('/test/testpack/edited/testfile1')).toBeFalsy()
-  })
-
-
-  test('Terminal success message', async () => {
-
-    await removeFromChange('/test/testpack', '/testfile1')
-
-    expect.assertions(3)
-    expect(console.log.mock.calls[0][0]).toBe('/testfile1')
-    expect(console.log.mock.calls[0][1]).toMatch(/deleted/)
-    expect(console.log.mock.calls[1][0]).toMatch(/updated/)
-  })
-
-
-  test('Removing deeply nested file (cleanup empty folders)', async () => {
-    
-    await removeFromChange('/test/testpack', '/folder1/folder2/folder3/testfile3')
+    await list('/test/testpack', false, false, false)
 
     expect.assertions(4)
-    expect(fs.existsSync('/test/testpack/original/folder1/folder2')).toBeFalsy()
-    expect(fs.existsSync('/test/testpack/original/folder1')).toBeTruthy()
-    expect(fs.existsSync('/test/testpack/edited/folder1/folder2')).toBeFalsy()
-    expect(fs.existsSync('/test/testpack/edited/folder1')).toBeTruthy()
+    expect(console.log.mock.calls[0][0]).not.toMatch(/folder/)
+    expect(console.log.mock.calls[0][0]).toMatch(/testfile1/)
+    expect(console.log.mock.calls[0][0]).toMatch(/testfile2/)
+    expect(console.log.mock.calls[0][0]).toMatch(/testfile3/)
   })
-  
 
-  test('Remove a changed file (console prompt)', async () => {
 
-    await removeFromChange('/test/testpack', '/folder1/testfile2')
+  test('List changes (verbose)', async () => {
+
+    const currentDate = new Date(Date.UTC(2017,0,1)).toLocaleString()
+    await list('/test/testpack', true, false, false)
 
     expect.assertions(3)
-    expect(areyousure.mock.calls.length).toBe(1)
-    expect(fs.existsSync('/test/testpack/original/folder1/testfile2')).toBeFalsy()
-    expect(fs.existsSync('/test/testpack/edited/folder1/testfile2')).toBeFalsy()
-    
+    expect(console.log.mock.calls[0][0]).toMatch(/folder/)
+    expect(console.log.mock.calls[0][0]).toMatch(/testfile/)
+    expect(console.log.mock.calls[0][0]).toMatch(currentDate)
   })
 
 
-  test('Attempting to remove a not added file', async () => {
-    
-    await removeFromChange('/test/testpack', '/testfile3')
+  test('List changes (full path)', async () => {
 
-    const chResult = fs.readJsonSync('/test/testpack/changes.json')
+    await list('/test/testpack', false, true, false)
 
-    expect.assertions(2)
-    expect(chResult.changes.length).toBe(3)
-    expect(console.log.mock.calls[0][0]).toMatch(/not registered/)
+    expect.assertions(3)
+    expect(console.log.mock.calls[0][0]).toMatch(/testfile1/)
+    expect(console.log.mock.calls[0][0]).toMatch(/folder1\/testfile2/)
+    expect(console.log.mock.calls[0][0]).toMatch(/folder1\/folder2\/folder3\/testfile3/)
   })
 
+
+  test('List changes (report to file)', async () => {
+
+    await list('/test/testpack', false, false, true)
+    const fileContent = fs.readFileSync('/test/testpack/report.txt', 'utf8')
+
+    expect.assertions(3)
+    expect(fileContent).toMatch(/testfile1/)
+    expect(fileContent).toMatch(/testfile2/)
+    expect(fileContent).toMatch(/testfile3/)
+  })
 })

@@ -1,5 +1,5 @@
 
-// Mock file system
+// Mocks
 
 jest.mock('fs')
 
