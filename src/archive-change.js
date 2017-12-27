@@ -21,30 +21,45 @@ async function archive(wdir) {
 
 	console.log(msg.MSG_ARCHIVE_START)
 
-	const date = new Date()
-	const fileStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '_' + path.basename(wdir)
-	let archivePath = path.join(wdir, '../', dpConf.archive, fileStr)
+  const archiveDir = dp.findArchiveDir(wdir)
 
-	fs.mkdirs(path.join(wdir, '../', dpConf.archive, path.basename(wdir)))
-		.then(_ => {
-			let counter = 0
-			while (fs.existsSync(archivePath + '.zip')) {
-				counter++
-				archivePath = path.join(wdir, '../', dpConf.archive, fileStr + '_' + counter)
-			}
-			archivePath += '.zip'
+	await fs.mkdirs(archiveDir)
 
-			const archiveFile =　fs.createWriteStream(archivePath)
-			const archive     = archiver('zip', {
-				zlib: { level: 9 }
-			})
+  return new Promise((resolve, reject) => {
 
-			archiveFile.on('close', _ => {
-				console.log(msg.MSG_ARCHIVE_COMPLETED,　archivePath)
-			})
-			archive.pipe(archiveFile)
-			archive.directory(wdir, false)
-			archive.finalize()
-		})
+    const currentDate = new Date(Date.now())
+    const basename    = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate() + '_' + path.basename(wdir)
 
+    const archivePath = genUniquePath(archiveDir, basename)
+    const archiveFile = fs.createWriteStream(archivePath)
+    const archive     = archiver('zip', { zlib: { level: 9 } })
+
+    archiveFile.on('warning', err => {
+      if (err.code === 'ENOENT') {
+        console.log('warning')
+      } else {
+        reject()
+      }
+    })
+
+    archiveFile.on('close', _ => {
+      console.log(msg.MSG_ARCHIVE_COMPLETED,　archivePath)
+      resolve()
+    })
+
+    archive.pipe(archiveFile)
+    archive.directory(wdir, false)
+    archive.finalize()
+  })
+}
+
+function genUniquePath(filepath, basename, seq = 0) {
+  const filename = basename + (seq !== 0 ? String(seq) : '') + '.zip'
+  const fullpath = path.join(filepath, filename)
+
+  if (!fs.existsSync(fullpath)) {
+    return fullpath
+  } else {
+    return genUniquePath(filepath, basename, (seq + 1))
+  }
 }

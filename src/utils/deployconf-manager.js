@@ -7,6 +7,7 @@ module.exports = {
   readSync,
   findDeployconfFile,
   findProjectDir,
+  findArchiveDir,
   dpFileName
 }
 
@@ -17,44 +18,70 @@ function exists(dpDir) {
 
 // Read the contents of the deployconf file
 function read(dpDir) {
-  const deployconfFile = findDeployconfFile(dpDir)
-  if (! deployconfFile) {
-    return Promise.reject(new Error('No deployconf file!'))
-  } 
-  return fs.open(deployconfFile, 'r') .then(chFile => fs.readJson(chFile))
+  try {
+
+    const deployconfFile = findDeployconfFile(dpDir)
+    return fs.open(deployconfFile, 'r') .then(chFile => fs.readJson(chFile))
+
+  } catch(e) {
+    return Promise.reject(e)
+  }
 }
 
 // Read the contents of the deployconf file
 function readSync(dpDir) {
-  const deployconfFile = findDeployconfFile(dpDir)
-  if (! deployconfFile) {
-    throw new Error('No deployconf file!')
-  } 
-  return fs.readJsonSync(findDeployconfFile(dpDir))
+  try {
+
+    const deployconfFile = findDeployconfFile(dpDir)
+    return fs.readJsonSync(findDeployconfFile(dpDir))
+
+  } catch(e) {
+    throw e
+  }
 }
 
 // Find the deployconf file in current directory, or any of its parents
 // If nothing found and empty string is returned
 function findDeployconfFile(directory) {
-  const projectDir = findProjectDir(directory)
-  return projectDir ? getDeployconfFile(projectDir) : ''
+  try {
+
+    const projectDir = findProjectDir(directory)
+    return projectDir ? getDeployconfFile(projectDir) : ''
+
+  } catch(e) {
+    throw e
+  }
 }
 
 // Search for a valid project directory (which has a deployconf file)
 // recursively until it reaches the root
 function findProjectDir(directory) {
   if (directory === '/' || directory === '') {
-    return ''
+    throw new Error('No deployconf file!')
+
   } else if (fs.existsSync(path.join(directory, dpFileName()))) {
     return directory
+
   } else {
     return findProjectDir(path.dirname(directory))
   }
 }
 
+// Find the archive directory
+function findArchiveDir(directory) {
+  try {
+
+    const projectDir = findProjectDir(directory)
+    return path.join(projectDir, readSync(directory).archive)
+
+  } catch(e) {
+    throw e
+  }
+}
+
 // Returns the filename of the deployconf file
 function dpFileName() {
-  return fs.readJsonSync(path.join(__dirname, '../../config.json')).deployconfFile.filename
+  return fs.readJsonSync(path.join(__dirname, '../../config.json')).deployconfFile.filename || '.deployconf'
 }
 
 //

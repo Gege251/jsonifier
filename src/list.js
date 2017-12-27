@@ -23,8 +23,8 @@ async function list(wdir, verbose, fullPath, report) {
 
   try {
     const chConf = await ch.read(wdir)
-    const files = chConf.changes
-    let output  = []
+    const files  = chConf.changes
+    let output   = []
 
     if (report) {
       chalk.enabled = false

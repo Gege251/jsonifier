@@ -1,12 +1,17 @@
 const fs   = require('fs-extra')
 const path = require('path')
 
-module.exports = { init, teardown }
+// Mock objects
 
-const currentDate = new Date(Date.UTC(2017,0,1)).toLocaleString()
-const newDate     = new Date(Date.UTC(2017,0,2)).toLocaleString()
+const currentDate = new Date(Date.UTC(2017,0,1))
+const newDate     = new Date(Date.UTC(2017,0,2))
+
 const mockObjects = {
-  config: JSON.stringify({
+
+  currentDate : currentDate,
+  newDate     : newDate,
+
+  config: {
     changesFile: {
       filename: 'changes.json',
       filetype: 'json'
@@ -15,45 +20,47 @@ const mockObjects = {
       filename: '.deployconf',
       filetype: 'json'
     }
-  }),
+  },
 
 
-  deployConf: JSON.stringify({
+  deployConf: {
     name            : 'Testdeploy',
     source          : '/source',
     originalVersion : '/original',
     editedVersion   : '/edited',
-    archive         : 'archive',
+    archive         : '/archive',
     otherDirs       : []
-  }),
+  },
 
 
-  chFile: JSON.stringify({
+  chFile: {
     name    : 'noname',
-    title   : '',
-    changes : [
+      title   : '',
+      changes : [
         {
           filename : 'testfile1',
           path     : '/',
-          added    : currentDate,
-          changed  : currentDate
+          added    : currentDate.toLocaleString(),
+          changed  : currentDate.toLocaleString()
         },
         {
           filename : 'testfile2',
           path     : '/folder1',
-          added    : currentDate,
-          changed  : newDate
+          added    : currentDate.toLocaleString(),
+          changed  : newDate.toLocaleString()
         },
         {
           filename : 'testfile3',
           path     : '/folder1/folder2/folder3',
-          added    : currentDate,
-          changed  : currentDate
+          added    : currentDate.toLocaleString(),
+          changed  : currentDate.toLocaleString()
         }
-    ],
-    lock    : false
-  })
+      ],
+      lock    : false
+  }
 }
+
+// Init function (to run before each test)
 
 function init(additionalFiles) {
 
@@ -66,9 +73,9 @@ function init(additionalFiles) {
     '/source/newfile1'                                          : 'This is a new file 1',
     '/source/newfolder1/newfile2'                               : 'This is a new file 2',
     '/source/newfolder1/newfolder2/newfolder3/newfile3'         : 'This is a new file 3',
-    [mockConfigPath]                                            : mockObjects.config,
-    '/test/.deployconf'                                         : mockObjects.deployConf,
-    '/test/testpack/changes.json'                               : mockObjects.chFile,
+    [mockConfigPath]                                            : JSON.stringify(mockObjects.config),
+    '/test/.deployconf'                                         : JSON.stringify(mockObjects.deployConf),
+    '/test/testpack/changes.json'                               : JSON.stringify(mockObjects.chFile),
     '/test/testpack/original/testfile1'                         : 'This is file 1',
     '/test/testpack/original/folder1/testfile2'                 : 'This is file 2',
     '/test/testpack/original/folder1/folder2/folder3/testfile3' : 'This is file 3',
@@ -81,8 +88,17 @@ function init(additionalFiles) {
   fs.vol.fromJSON(mockFileSystem)
 
   console.log = jest.fn()
+
+  Date.now = jest.fn(() => currentDate)
+
 }
+
+// Teardown function to run after each test
 
 function teardown() {
   fs.vol.reset()
 }
+
+// Exports
+
+module.exports = { init, teardown, mockObjects }

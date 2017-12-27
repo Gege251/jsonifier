@@ -1,5 +1,5 @@
 
-// Mocks
+// Mocks and imports
 
 jest.mock('fs')
 jest.mock('../src/utils/areyousure', () => {
