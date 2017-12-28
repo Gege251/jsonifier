@@ -15,6 +15,7 @@
     "minimist": "^1.2.0"
   },
   "devDependencies": {
+    "jest": "^22.0.4",
     "memfs": "^2.6.0"
   },
   "scripts": {

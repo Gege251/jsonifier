@@ -56,7 +56,7 @@ function findDeployconfFile(directory) {
 // Search for a valid project directory (which has a deployconf file)
 // recursively until it reaches the root
 function findProjectDir(directory) {
-  if (directory === '/' || directory === '') {
+  if (!directory || directory === '/') {
     throw new Error('No deployconf file!')
 
   } else if (fs.existsSync(path.join(directory, dpFileName()))) {
@@ -70,10 +70,8 @@ function findProjectDir(directory) {
 // Find the archive directory
 function findArchiveDir(directory) {
   try {
-
     const projectDir = findProjectDir(directory)
     return path.join(projectDir, readSync(directory).archive)
-
   } catch(e) {
     throw e
   }

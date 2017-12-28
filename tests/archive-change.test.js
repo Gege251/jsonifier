@@ -3,9 +3,9 @@
 
 jest.mock('fs')
 
-const path  = require('path')
-const fs    = require('fs-extra')
-const setup = require('./setup')
+const path    = require('path')
+const fs      = require('fs-extra')
+const setup   = require('./setup')
 
 // Setup
 
@@ -33,7 +33,7 @@ describe('Archiving a change', () => {
     expect(fs.existsSync('/test/archive/2017-1-1_testpack.zip')).toBeTruthy()
   })
 
-  test('Making multiple archives on the same day', async () => {
+  test.skip('Making multiple archives on the same day', async () => {
     
     await archiveChange('/test/testpack')
     await archiveChange('/test/testpack')
@@ -45,7 +45,7 @@ describe('Archiving a change', () => {
     expect(fs.existsSync('/test/archive/2017-1-1_testpack2.zip')).toBeTruthy()
   })
 
-  test('Assuring terminal messages', async () => {
+  test.skip('Assuring terminal messages', async () => {
     await archiveChange('/test/testpack')
 
     expect(console.log.mock.calls[0][0]).toMatch(/Archiving/)

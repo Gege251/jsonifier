@@ -29,7 +29,10 @@ const mockObjects = {
     originalVersion : '/original',
     editedVersion   : '/edited',
     archive         : '/archive',
-    otherDirs       : []
+    otherDirs       : [
+      '/other1',
+      '/other2'
+    ]
   },
 
 
@@ -82,7 +85,7 @@ function init(additionalFiles) {
     '/test/testpack/edited/testfile1'                           : 'This is file 1',
     '/test/testpack/edited/folder1/testfile2'                   : 'This is file 2 edited',
     '/test/testpack/edited/folder1/folder2/folder3/testfile3'   : 'This is file 3',
-    '/test/testpack2/'                                          : ''
+    '/test/testpack2/.empty'                                    : ''
   }
 
   fs.vol.fromJSON(mockFileSystem)
