@@ -1,5 +1,8 @@
-const fs   = require('fs-extra')
-const path = require('path')
+const fs           = require('fs-extra')
+const path         = require('path')
+
+const EventEmitter = require('events')
+const consoleSpy   = new EventEmitter()
 
 // Mock objects
 
@@ -60,7 +63,30 @@ const mockObjects = {
         }
       ],
       lock    : false
-  }
+  },
+
+
+  chFile2: {
+    name    : 'noname',
+      title   : '',
+      changes : [],
+      lock    : false
+  },
+
+
+  chFile3: {
+    name    : 'noname',
+      title   : '',
+      changes : [
+        {
+          filename : 'testfile1',
+          path     : '/',
+          added    : currentDate.toLocaleString(),
+          changed  : currentDate.toLocaleString()
+        }
+      ],
+      lock    : true
+  },
 }
 
 // Init function (to run before each test)
@@ -71,7 +97,7 @@ function init(additionalFiles) {
 
   const mockFileSystem = {
     '/source/testfile1'                                         : 'This is file 1',
-    '/source/folder1/testfile2'                                 : 'This is file 2',
+    '/source/folder1/testfile2'                                 : 'This is file 2 edited',
     '/source/folder1/folder2/folder3/testfile3'                 : 'This is file 3',
     '/source/newfile1'                                          : 'This is a new file 1',
     '/source/newfolder1/newfile2'                               : 'This is a new file 2',
@@ -79,18 +105,26 @@ function init(additionalFiles) {
     [mockConfigPath]                                            : JSON.stringify(mockObjects.config),
     '/test/.deployconf'                                         : JSON.stringify(mockObjects.deployConf),
     '/test/testpack/changes.json'                               : JSON.stringify(mockObjects.chFile),
+    '/test/testpack3/changes.json'                              : JSON.stringify(mockObjects.chFile2),
+    '/test/testpack4/changes.json'                              : JSON.stringify(mockObjects.chFile3),
     '/test/testpack/original/testfile1'                         : 'This is file 1',
     '/test/testpack/original/folder1/testfile2'                 : 'This is file 2',
     '/test/testpack/original/folder1/folder2/folder3/testfile3' : 'This is file 3',
     '/test/testpack/edited/testfile1'                           : 'This is file 1',
     '/test/testpack/edited/folder1/testfile2'                   : 'This is file 2 edited',
     '/test/testpack/edited/folder1/folder2/folder3/testfile3'   : 'This is file 3',
+    '/test/testpack3/original/folder1/testfile2'                : 'This is file 2 edited',
+    '/test/testpack3/edited/folder1/testfile2'                  : 'This is file 2 alternatively edited',
+    '/test/testpack4/original/testfile1'                         : 'This is file 1',
+    '/test/testpack4/edited/testfile1'                           : 'This is file 1',
     '/test/testpack2/.empty'                                    : ''
   }
 
   fs.vol.fromJSON(mockFileSystem)
 
-  console.log = jest.fn()
+  console.log = jest.fn((...args) => {
+    consoleSpy.emit('called', ...args)
+  })
 
   Date.now = jest.fn(() => currentDate)
 
@@ -104,4 +138,4 @@ function teardown() {
 
 // Exports
 
-module.exports = { init, teardown, mockObjects }
+module.exports = { init, teardown, mockObjects, consoleSpy }

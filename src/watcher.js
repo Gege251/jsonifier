@@ -46,7 +46,7 @@ async function watcher(wdir) {
 
       // Reading user input
       process.stdin.setEncoding('utf8')
-      process.stdin.on('readable', _ => {
+      process.stdin.on('readable', () => {
         const chunk = process.stdin.read()
 
         if (chunk) {
@@ -86,7 +86,7 @@ async function watcher(wdir) {
                     filename: path.basename(args[1])
                   }
                   const wrIndex = watchers.findIndex(e => e.file.filename === change.filename && e.file.path === change.path)
-                  const chIndex = changes.findIndex(chf => chf.filename === change.filename && chf.paht === change.path)
+                  const chIndex = changes.findIndex(chf => chf.filename === change.filename && chf.path === change.path)
                   watchers[wrIndex].watcher.close()
                   watchers.splice(wrIndex, 1)
                   changes.splice(chIndex, 1)
@@ -96,7 +96,9 @@ async function watcher(wdir) {
           }
 
           if (args[0] === 'exit') {
+            process.stdin.end()
             process.exit()
+            return Promise.resolve()
           }
         }
       })

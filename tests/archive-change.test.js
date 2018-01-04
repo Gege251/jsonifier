@@ -33,7 +33,7 @@ describe('Archiving a change', () => {
     expect(fs.existsSync('/test/archive/2017-1-1_testpack.zip')).toBeTruthy()
   })
 
-  test.skip('Making multiple archives on the same day', async () => {
+  test('Making multiple archives on the same day', async () => {
     
     await archiveChange('/test/testpack')
     await archiveChange('/test/testpack')
@@ -45,7 +45,7 @@ describe('Archiving a change', () => {
     expect(fs.existsSync('/test/archive/2017-1-1_testpack2.zip')).toBeTruthy()
   })
 
-  test.skip('Assuring terminal messages', async () => {
+  test('Assuring terminal messages', async () => {
     await archiveChange('/test/testpack')
 
     expect(console.log.mock.calls[0][0]).toMatch(/Archiving/)
