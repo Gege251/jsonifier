@@ -24,47 +24,85 @@ afterEach(() => {
 describe('Watcher module', () => {
   const watcher      = require('../src/watcher.js')
 
-  beforeEach(() => {
-    process.stdin.read = jest.fn()
-    process.stdin.read.mockReturnValueOnce('exit\n')
-  })
-
-
   test('Change a file while watched', async () => {
+
     const app = watcher('/test/testpack')
-    await new Promise((resolve) => setup.consoleSpy.on('called', resolve) )
+    await waitForConsole()
 
     await fs.appendFile('/source/testfile1', ' edited')
-    await new Promise((resolve) => setup.consoleSpy.on('called', resolve) )
+    await waitForConsole()
 
     expect(assertFile('/test/testpack/edited/testfile1')).toBe('This is file 1 edited')
     expect(console.log.mock.calls[0][0]).toMatch(/Watching/i)
+
+    emulateInput('exit')
     await app
   })
 
   test('Attempt to start watcher while locked', async () => {
-    const watch = watcher('/test/testpack4')
-    await new Promise((resolve) => setup.consoleSpy.on('called', resolve) )
+    const app = watcher('/test/testpack4')
+    await waitForConsole()
 
     expect(console.log.mock.calls[0][0]).toMatch('locked')
+    await app
   })
 
-  test.skip('Attempt to start watcher in an empty change', async () => {
-    const watch = watcher('/test/testpack3')
-    await new Promise((resolve) => setup.consoleSpy.on('called', resolve) )
+  test('Attempt to start watcher in an empty change', async () => {
+    const app = watcher('/test/testpack3')
+    await waitForConsole()
 
     expect(console.log.mock.calls[0][0]).toMatch('empty')
+    await app
   })
 
-  test.skip('List files')
+  test.skip('List files', async () => {
+    const app = watcher('/test/testpack')
+    await waitForConsole()
 
-  test.skip('Add new file')
+    emulateInput('ls')
+    await waitForConsole()
+    expect(console.log.mock.calls[1][0]).toMatch('testfile1')
+    expect(console.log.mock.calls[1][0]).toMatch('testfile2')
 
-  test.skip('Remove a file')
+    emulateInput('exit')
+    await app
+  })
 
-  test.skip('Error message checks')
+  test.skip('Add new file', async () => {
+    const app = watcher('/test/testpack')
+    await waitForConsole()
+
+    emulateInput('+ newfile1')
+    await waitForConsole()
+    expect(console.log.mock.calls[1][0]).toMatch('added')
+
+    emulateInput('exit')
+    await app
+  })
+
+  test.skip('Remove a file', async () => {
+    const app = watcher('/test/testpack')
+    await waitForConsole()
+
+    emulateInput('- /testfile1')
+    await waitForConsole()
+    expect(console.log.mock.calls[1][1]).toMatch('deleted')
+
+    emulateInput('exit')
+    await app
+  })
 })
 
 function assertFile(filepath) {
   return fs.vol.toJSON()[filepath]
+}
+
+function emulateInput(inputstr) {
+  process.stdin.read = jest.fn()
+  process.stdin.read.mockReturnValueOnce(inputstr)
+  process.stdin.emit('readable')
+}
+
+async function waitForConsole() {
+  await new Promise((resolve) => setup.consoleSpy.on('called', resolve) )
 }

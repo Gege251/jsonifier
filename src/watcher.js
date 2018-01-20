@@ -10,114 +10,136 @@ const log      = logger.log
 module.exports = watcher
 
 async function watcher(wdir) {
-  let watchers
+  return new Promise(async (resolveApp) => {
+    let watchers
+    let jobs = []
 
-	if (! dp.exists(wdir)) {
-		console.log(msg.ERR_NO_PROJECT)
-		return Promise.resolve(false)
-	}
-	const dpConf = await dp.read(wdir)
+    if (! dp.exists(wdir)) {
+      console.log(msg.ERR_NO_PROJECT)
+      resolveApp(false)
+    }
+    const dpConf = await dp.read(wdir)
 
-  logger.setLogFile(dpConf.logging ? path.join(wdir, 'changes.log') : null)
+    logger.setLogFile(dpConf.logging ? path.join(wdir, 'changes.log') : null)
 
-  const changesConf = await ch.read(wdir)
-  const changes = changesConf.changes
+    const changesConf = await ch.read(wdir)
+    const changes = changesConf.changes
 
-  if (changes.length < 1) {
-    console.log(msg.ERR_CHANGE_EMPTY)
-    return
-  }
+    if (changes.length < 1) {
+      console.log(msg.ERR_CHANGE_EMPTY)
+      resolveApp()
+      return
+    }
 
-  if (changesConf.lock) {
-    console.log(msg.ERR_LOCKED)
-    return
-  }
+    if (changesConf.lock) {
+      console.log(msg.ERR_LOCKED)
+      resolveApp()
+      return
+    }
 
-  watchers = changes.map(change => {
-    return {
-        file: change,
-        watcher: chokidar.watch(path.join(dpConf.source, change.path, change.filename))
-          .on('change', watchedFile => onChange(change, dpConf, changesConf))
+
+    watchers = changes.map(change => {
+      return {
+          file: change,
+          watcher: chokidar.watch(path.join(dpConf.source, change.path, change.filename))
+            .on('change', watchedFile => onChange(change, dpConf, changesConf))
       }
     })
 
-  try {
+
+    try {
       console.log(msg.MSG_WATCHING_START, dpConf.source)
 
       // Reading user input
       process.stdin.setEncoding('utf8')
       process.stdin.on('readable', () => {
-        const chunk = process.stdin.read()
+        jobs.push(new Promise(async (resolveJob) => {
 
-        if (chunk) {
-          const args = chunk.split(/[\s\n]/).filter(e => e)
+          const chunk = process.stdin.read()
+          if (chunk) {
 
-          if (args[0] === 'ls') {
-            (require('./list.js'))(wdir)
-          }
+            const args = chunk.split(/[\s\n]/).filter(e => e)
 
-          if (['add', '+'].includes(args[0])) {
-            (require('./add-to-change'))(wdir, args[1])
-              .then(result => {
-                if (result) {
-                  changesConf = ch.read(wdir)
-                  changes = changesConf.changes
+            if (['list', 'ls'].includes(args[0])) {
+              (require('./list.js'))(wdir)
+                .then(() => {
+                  resolveJob()
+                })
+            }
 
-                  let change =
-                    changes.find(ch => 
-                      ch.filename === path.basename(args[1]) && ch.path === path.dirname(args[1]))
+            else if (['add', '+'].includes(args[0])) {
+              (require('./add-to-change'))(wdir, args[1])
+                .then(result => {
+                  if (result) {
 
-                  watchers.push({
-                    file: change,
-                    watcher: chokidar.watch(path.join(dpConf.source, args[1]))
-                      .on('change', watchedFile => onChange(change, dpConf, changesConf))
-                  })
-                  console.log(msg.MSG_WATCHING_ADDED)
-                }
-              })
-          }
+                    let change =
+                      changes.find(ch => 
+                        ch.filename === path.basename(args[1]) && ch.path === path.dirname(args[1]))
 
-          if (['remove', '-'].includes(args[0])) {
-            (require('./remove-from-change'))(wdir, args[1])
-              .then(result => {
-                if (result) {
-                  let change = {
-                    path: path.dirname(args[1]),
-                    filename: path.basename(args[1])
+                    watchers.push({
+                      file: change,
+                      watcher: chokidar.watch(path.join(dpConf.source, args[1]))
+                        .on('change', watchedFile => onChange(change, dpConf, changesConf))
+                    })
+                    console.log(msg.MSG_WATCHING_ADDED)
+                    resolveJob()
                   }
-                  const wrIndex = watchers.findIndex(e => e.file.filename === change.filename && e.file.path === change.path)
-                  const chIndex = changes.findIndex(chf => chf.filename === change.filename && chf.path === change.path)
-                  watchers[wrIndex].watcher.close()
-                  watchers.splice(wrIndex, 1)
-                  changes.splice(chIndex, 1)
-                  console.log(msg.MSG_WATCHING_REMOVED)
-                }
-            })
-          }
+                })
+            }
 
-          if (args[0] === 'exit') {
-            process.stdin.end()
-            process.exit()
-            return Promise.resolve()
+            else if (['remove', '-'].includes(args[0])) {
+              (require('./remove-from-change'))(wdir, args[1])
+                .then(result => {
+                  if (result) {
+                    let change = {
+                      path: path.dirname(args[1]),
+                      filename: path.basename(args[1])
+                    }
+                    const wrIndex = watchers.findIndex(e => e.file.filename === change.filename && e.file.path === change.path)
+                    const chIndex = changes.findIndex(chf => chf.filename === change.filename && chf.path === change.path)
+                    watchers[wrIndex].watcher.close()
+                    watchers.splice(wrIndex, 1)
+                    changes.splice(chIndex, 1)
+                    console.log(msg.MSG_WATCHING_REMOVED)
+                    resolveJob()
+                  }
+              })
+            }
+
+            else if (args[0] === 'exit') {
+              await Promise.all(jobs)
+              resolveApp()
+              process.stdin.end()
+            }
+
+            else {
+              resolveJob()
+            }
+          } else {
+            resolveJob()
           }
-        }
+        }))
       })
-
     } catch(e) {
       console.log(msg.ERR_NO_PROJECT)
     }
-
+    
     async function onChange(change, dpConf, changesConf) {
 
       try {
-        await fs.copy(path.join(dpConf.source, change.path, change.filename),
-                path.join(wdir, dpConf.editedVersion, change.path, change.filename))
-        log(change.filename + ' ' + msg.MSG_SAVED)
-        await ch.updateFile(wdir, path.join(change.path, change.filename))
-        log(msg.MSG_CHANGES_UPDATED)
+        jobs.push(new Promise(async (resolveJob) => {
+          await fs.copy(path.join(dpConf.source, change.path, change.filename),
+                  path.join(wdir, dpConf.editedVersion, change.path, change.filename))
+          log(change.filename + ' ' + msg.MSG_SAVED)
+          await ch.updateFile(wdir, path.join(change.path, change.filename))
+          log(msg.MSG_CHANGES_UPDATED)
+          resolveJob()
+        }))
       } catch(e) { 
         log(msg.ERR_FILE_RW)
       }
     }
+  })
+    
 
 }
