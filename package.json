@@ -1,6 +1,6 @@
 {
   "name": "scw",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "bin": "./bin/scw",
   "description": "Source Code Watcher",
   "main": "scw.js",
@@ -23,14 +23,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gege251/jsonifier.git"
+    "url": "git+https://github.com/gege251/scw.git"
   },
   "author": "Szabo Gergely",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Gege251/jsonifier/issues"
+    "url": "https://github.com/gege251/scw/issues"
   },
-  "homepage": "https://github.com/Gege251/jsonifier#readme",
+  "homepage": "https://github.com/gege251/scw#readme",
   "pkg": {
     "scripts": "lib/**/*",
     "assets": "lang/**/*.json"
