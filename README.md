@@ -1,4 +1,6 @@
 # scw
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 Source Code Watcher
 
 CLI tool for managing source code excerpts (current working part of a project)
