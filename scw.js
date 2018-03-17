@@ -1,28 +1,28 @@
-const parseArgs	= require('minimist');
-const fs				= require('fs-extra');
-const path			= require('path');
+const parseArgs	= require('minimist')
+const fs				= require('fs-extra')
+const path			= require('path')
 
-const argv			= parseArgs(process.argv.slice(2));
-const config    = fs.readJsonSync(path.join(__dirname, 'config.json'));
+const argv			= parseArgs(process.argv.slice(2))
+const config    = fs.readJsonSync(path.join(__dirname, 'config.json'))
 
-const lang			= require('./lang/lang.js');
-lang.setLang(argv.lang || fs.readJsonSync(path.join(__dirname, './config.json')).lang);
+const lang			= require('./src/lang/lang.js')
+lang.setLang(argv.lang || fs.readJsonSync(path.join(__dirname, './config.json')).lang)
 
-const msg 			= lang.getMessages();
-const directory	= path.resolve(argv.d || process.cwd());
+const msg 			= lang.messages
+const directory	= path.resolve(argv.d || process.cwd())
 
 const modules = [
 	{
 		keys: [ 'init' ],
-		path: './lib/init',
+		path: './src/init',
 		args: [ directory ],
 		description: {
 			en: 'Initialize project folder.',
 			ja: '新規プロジェクトフォルダーを作成。' }
 	},
 	{
-		keys: [ 'new', 'n' ],
-		path: './lib/new-change',
+		keys: [ 'new-change', 'nc' ],
+		path: './src/new-change',
 		args: [ directory, argv._[1], argv.t || argv.title ],
 		description: {
 			en: 'Create a new change folder.',
@@ -30,15 +30,23 @@ const modules = [
 	},
 	{
 		keys: [ 'add', '+' ],
-		path: './lib/add-to-change',
+		path: './src/add-to-change',
 		args: [ directory, argv._[1] ],
 		description: {
 			en: 'Add a new file to change.',
 			ja: 'ファイルを課題に追加。' }
 	},
 	{
+		keys: [ 'new', '.+' ],
+		path: './src/newfile-to-change',
+		args: [ directory, argv._[1] ],
+		description: {
+			en: 'Create a new file to change.',
+			ja: '新規ファイルを課題に追加。' }
+	},
+	{
 		keys: [ 'remove', '-' ],
-		path: './lib/remove-from-change',
+		path: './src/remove-from-change',
 		args: [ directory, argv._[1] ],
 		description: {
 			en: 'Remove a file from change',
@@ -46,7 +54,7 @@ const modules = [
 	},
 	{
 		keys: [ 'archive', 'ar' ],
-		path: './lib/archive-change',
+		path: './src/archive-change',
 		args: [ directory ],
 		description: {
 			en: 'Archive a change to zip file.',
@@ -54,7 +62,7 @@ const modules = [
 	},
 	{
 		keys: [ 'watcher', 'w' ],
-		path: './lib/watcher',
+		path: './src/watcher',
 		args: [ directory ],
 		description: {
 			en: 'Watch source code for changes.',
@@ -62,7 +70,7 @@ const modules = [
 	},
 	{
 		keys: [ 'ls' ],
-		path: './lib/list',
+		path: './src/list',
 		args: [ directory, argv.l, argv.f, argv.r ],
 		description: {
 			en: 'List files in the change. Options: -l detailed, -f full path, -r report to file',
@@ -70,7 +78,7 @@ const modules = [
 	},
 	{
 		keys: [ 'create-dirs', 'crd' ],
-		path: './lib/create-dirs',
+		path: './src/create-dirs',
 		args: [ directory ],
 		description: {
 			en: 'Create subdirectories in change folder.',
@@ -78,75 +86,72 @@ const modules = [
 	},
 	{
 		keys: [ 'stats', 's' ],
-		path: './lib/stats',
+		path: './src/stats',
 		args: [ directory, argv.r ],
 		description: {
 			en: 'Write out statistics about current project.',
 			ja: 'プロジェクト統計を表示。' }
 	},
 	{
-		keys: [ 'tasks', 't' ],
-		path: './lib/tasks/tasks',
+		keys: [ 'patch', 'p' ],
+		path: './src/patch',
 		args: [ directory ],
 		description: {
-			en: 'Lists all tasks. Options: -a all',
-			ja: 'タスク一覧表示。オプション: -a 全部' }
+			en: 'Applies changes to source',
+			ja: '変更をソースに反映' }
 	},
 	{
-		keys: [ 'add-task', 't+' ],
-		path: './lib/tasks/add-task',
-		args: [ directory, argv._[1] ],
+		keys: [ 'unpatch', 'unp' ],
+		path: './src/unpatch',
+		args: [ directory ],
 		description: {
-			en: 'Adds a new task to change.',
-			ja: '新規タスク作成。' }
-	},
-	{
-		keys: [ 'remove-task', 't-' ],
-		path: './lib/tasks/remove-task',
-		args: [ directory, argv._[1] ],
-		description: {
-			en: 'Removes a task from change.',
-			ja: 'タスク排除。' }
-	},
+			en: 'Rollback to original',
+			ja: '修正前の状態にロールバック' }
+	}
 ]
 
 function loadModule(moduleName) {
-	const module = modules.find(module => module.keys.includes(moduleName));
+	const module = modules.find(module => module.keys.includes(moduleName))
 	if (module) {
-		(require(module.path))(...module.args);
+		(require(module.path))(...module.args)
 	}
 
-	else if (!moduleName) {
-		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
+	else if (!moduleName && !argv.v) {
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'))
 
-		console.log(`${npmConf.name} v${npmConf.version}`);
-		console.log(msg.MSG_WELCOME);
-		return;
+		console.log(`${npmConf.name} v${npmConf.version}`)
+		console.log(msg.MSG_WELCOME)
+		return
 	}
 
-	else if (moduleName == 'help') {
+	else if (moduleName === 'help') {
 		// Listing all command options
-		console.log(msg.MSG_HELP +'\n');
+		console.log(msg.MSG_HELP +'\n')
 
-		modules.forEach(module => module.keys = module.keys.join(', '));
+		modules.forEach(module => module.keys = module.keys.join(', '))
 		var longest = modules
 			.map(module => module.keys.length)
-			.reduce((m1, m2) => Math.max(m1, m2));
+			.reduce((m1, m2) => Math.max(m1, m2))
 
 		modules.forEach(module => {
-			let spaces = ' '.repeat(longest - module.keys.length + 2);
-			console.log('\t' + module.keys + spaces + module.description[lang.getLang()]);
+			let spaces = ' '.repeat(longest - module.keys.length + 2)
+			console.log('\t' + module.keys + spaces + module.description[lang.getLang()])
 		})
-		return;
+		return
+	}
+
+	else if (moduleName === 'version' || argv.v) {
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'))
+		console.log(`${npmConf.version}`)
 	}
 
 	else {
-		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'));
+		const npmConf = fs.readJsonSync(path.join(__dirname, 'package.json'))
 
-		console.log(`${npmConf.name} v${npmConf.version}`);
-		console.log(msg.ERR_NO_SUCH_COMMAND);
-		return;
+		console.log(`${npmConf.name} v${npmConf.version}`)
+		console.log(msg.ERR_NO_SUCH_COMMAND)
+		return
 	}
 }
 
-loadModule(argv._[0]);
+loadModule(argv._[0])
